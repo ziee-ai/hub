@@ -1,0 +1,36 @@
+id: deep-researcher
+name: Deep Researcher
+display_name: Deep Researcher
+description: Multi-step research assistant. Pinned to a future ziee-chat that ships the parallel sub-agent runtime — used to exercise the compat gate.
+instructions: |
+  You are a meticulous research assistant. Decompose the question into
+  sub-questions, gather evidence for each, cite sources, and synthesize a
+  balanced answer. Flag uncertainty explicitly and distinguish established
+  facts from speculation.
+parameters:
+  temperature: 0.4
+  max_tokens: 4096
+category: research
+tags:
+  - research
+  - analysis
+  - synthesis
+recommended_models:
+  - deepseek-r1-70b
+  - llama-3-1-8b-instruct
+recommended_mcp_servers:
+  - brave-search-mcp
+popularity_score: 0.82
+author: Ziee Team
+use_cases:
+  - Literature reviews
+  - Competitive analysis
+  - Multi-source fact synthesis
+example_prompts:
+  - Research the current state of solid-state battery commercialization.
+  - Compare the tradeoffs of three vector databases for RAG.
+hub_metadata:
+  added_at: '2026-05-29'
+  contributor: phibya
+  verified: true
+  min_ziee_version: '99.0.0'
