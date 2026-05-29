@@ -1,0 +1,41 @@
+id: linear-mcp
+name: linear
+display_name: Linear MCP Server
+description: Manage Linear issues, projects, and cycles over the Streamable HTTP transport.
+category: productivity
+tags:
+  - linear
+  - issues
+  - project-management
+  - api
+transport_type: streamable-http
+environment_variables:
+  LINEAR_API_KEY: ''
+url: https://mcp.linear.app/sse
+headers:
+  Authorization: Bearer ${LINEAR_API_KEY}
+author: Linear
+homepage: https://linear.app
+repository_url: https://github.com/linear/linear-mcp
+documentation_url: https://linear.app/docs/mcp
+version: 1.0.0
+license: MIT
+popularity_score: 84.0
+requires_desktop: false
+platform_support: [windows, macos, linux]
+tool_count: 14
+tool_categories: [issue-tracking, project-management]
+example_tools:
+  - create_issue
+  - list_issues
+  - update_issue
+  - list_projects
+use_cases:
+  - Creating and triaging Linear issues from chat
+  - Reviewing project + cycle status
+  - Bulk-updating issue state
+hub_metadata:
+  added_at: '2026-05-29'
+  contributor: phibya
+  verified: true
+  min_ziee_version: '99.0.0'
