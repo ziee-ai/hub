@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v1/assistant.schema.json",
+  "title": "Assistant manifest",
+  "description": "A pre-configured assistant (system prompt + recommended model + optional MCP server defaults) listed in the ziee hub.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "instructions",
+    "category",
+    "tags",
+    "hub_metadata"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$",
+      "description": "Globally unique stable id. Lowercase. Must match the filename (id.yaml)."
+    },
+    "name":         { "type": "string", "minLength": 1, "maxLength": 120 },
+    "display_name": { "type": "string", "maxLength": 80 },
+    "description":  { "type": "string", "minLength": 8, "maxLength": 600 },
+    "instructions": { "type": "string", "minLength": 16 },
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "temperature": { "type": ["number", "null"] },
+        "top_p":       { "type": ["number", "null"] },
+        "max_tokens":  { "type": ["integer", "null"], "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "category": {
+      "type": "string",
+      "enum": ["development", "writing", "research", "vision", "productivity", "education", "business", "creative", "other"]
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,40}$" },
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "recommended_models": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$",
+        "description": "Refers to model.id (must exist in models/)."
+      },
+      "uniqueItems": true
+    },
+    "recommended_mcp_servers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$",
+        "description": "Refers to mcp-server.id (must exist in mcp-servers/)."
+      },
+      "uniqueItems": true
+    },
+    "capabilities_required": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["chat", "tools", "vision", "audio", "text_embedding", "image_generator", "code_interpreter"]
+      },
+      "uniqueItems": true
+    },
+    "popularity_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "author": { "type": "string", "maxLength": 80 },
+    "use_cases": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+      "maxItems": 12
+    },
+    "example_prompts": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 400 },
+      "maxItems": 12
+    },
+    "hub_metadata": { "$ref": "_hub_metadata.schema.json" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v1/mcp-server.schema.json",
+  "title": "MCP server manifest",
+  "description": "A Model-Context-Protocol server listed in the ziee hub. Transport is stdio | http | streamable-http (per the current MCP spec).",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "category",
+    "tags",
+    "transport_type",
+    "hub_metadata"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$",
+      "description": "Globally unique stable id. Lowercase. Must match the filename (id.yaml)."
+    },
+    "name":         { "type": "string", "minLength": 1, "maxLength": 120 },
+    "display_name": { "type": "string", "maxLength": 80 },
+    "description":  { "type": "string", "minLength": 8, "maxLength": 600 },
+    "category": {
+      "type": "string",
+      "enum": ["development", "utilities", "search", "database", "productivity", "ai-tools", "research", "creative", "business", "other"]
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,40}$" },
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "transport_type": {
+      "type": "string",
+      "enum": ["stdio", "http", "streamable-http"]
+    },
+    "command":               { "type": ["string", "null"] },
+    "args":                  { "type": ["array", "null"], "items": { "type": "string" } },
+    "environment_variables": {
+      "type": ["object", "null"],
+      "additionalProperties": { "type": "string" },
+      "description": "Required env var keys (values are placeholders to be filled by the user)."
+    },
+    "url":     { "type": ["string", "null"], "format": "uri" },
+    "headers": {
+      "type": ["object", "null"],
+      "additionalProperties": { "type": "string" }
+    },
+    "supports_sampling":  { "type": "boolean" },
+    "author":             { "type": "string", "maxLength": 80 },
+    "homepage":           { "type": ["string", "null"], "format": "uri" },
+    "repository_url":     { "type": ["string", "null"], "format": "uri" },
+    "documentation_url":  { "type": ["string", "null"], "format": "uri" },
+    "icon_url":           { "type": ["string", "null"], "format": "uri" },
+    "version":            { "type": "string" },
+    "license":            { "type": ["string", "null"] },
+    "popularity_score":   { "type": "number", "minimum": 0, "maximum": 100 },
+    "requires_desktop":   { "type": "boolean" },
+    "platform_support": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["linux", "macos", "windows"] },
+      "uniqueItems": true
+    },
+    "tool_count":      { "type": ["integer", "null"], "minimum": 0 },
+    "tool_categories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "example_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "use_cases": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 200 },
+      "maxItems": 12
+    },
+    "example_prompts": {
+      "type": ["array", "null"],
+      "items": { "type": "string", "minLength": 1, "maxLength": 400 },
+      "maxItems": 12
+    },
+    "hub_metadata": { "$ref": "_hub_metadata.schema.json" }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": { "properties": { "transport_type": { "const": "stdio" } } },
+      "then": {
+        "required": ["command"],
+        "properties": {
+          "command": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "transport_type": { "enum": ["http", "streamable-http"] } } },
+      "then": {
+        "required": ["url"],
+        "properties": {
+          "url": { "type": "string", "format": "uri" }
+        }
+      }
+    }
+  ]
+}

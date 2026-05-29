@@ -1,0 +1,42 @@
+id: postgres-mcp
+name: postgres
+display_name: PostgreSQL MCP Server
+description: Connect to PostgreSQL databases and execute queries, manage schemas, and analyze data.
+category: database
+tags:
+  - database
+  - sql
+  - postgresql
+  - data
+transport_type: stdio
+command: npx
+args:
+  - '-y'
+  - '@modelcontextprotocol/server-postgres'
+environment_variables:
+  POSTGRES_CONNECTION_STRING: postgresql://user:password@localhost:5432/dbname
+author: Anthropic
+homepage: https://github.com/modelcontextprotocol/servers
+repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/postgres
+documentation_url: https://github.com/modelcontextprotocol/servers/blob/main/src/postgres/README.md
+version: 1.0.0
+license: MIT
+popularity_score: 90.0
+requires_desktop: true
+platform_support: [windows, macos, linux]
+tool_count: 12
+tool_categories: [database-operations, query-execution, schema-management]
+example_tools:
+  - execute_query
+  - list_tables
+  - describe_table
+  - create_backup
+use_cases:
+  - Querying database information
+  - Analyzing data and generating reports
+  - Managing database schemas
+  - Data migration and backup operations
+hub_metadata:
+  added_at: '2026-05-29'
+  contributor: phibya
+  verified: true

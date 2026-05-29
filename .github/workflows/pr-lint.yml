@@ -1,0 +1,52 @@
+name: pr-lint
+
+# Run JSON-Schema validation + cross-reference checks on every PR that touches
+# the catalog. Builds index.json as a sanity check (no upload).
+
+on:
+  pull_request:
+    paths:
+      - 'models/**'
+      - 'assistants/**'
+      - 'mcp-servers/**'
+      - 'schemas/**'
+      - 'scripts/**'
+      - '.github/workflows/pr-lint.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'models/**'
+      - 'assistants/**'
+      - 'mcp-servers/**'
+      - 'schemas/**'
+      - 'scripts/**'
+
+concurrency:
+  group: pr-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install deps
+        run: pip install --quiet 'pyyaml>=6' 'jsonschema>=4.21' 'referencing>=0.35'
+
+      - name: validate manifests
+        run: python3 scripts/validate.py
+
+      - name: build index.json (smoke)
+        run: |
+          mkdir -p dist
+          python3 scripts/build-index.py --version 0.0.0-pr --out dist/hub-pr.index.json
+          head -40 dist/hub-pr.index.json

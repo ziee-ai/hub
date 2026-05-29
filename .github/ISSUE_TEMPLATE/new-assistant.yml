@@ -1,0 +1,50 @@
+name: Suggest a new assistant
+description: Propose adding a pre-configured assistant (system prompt + recommended models) to the ziee hub.
+title: "[assistant] <name>"
+labels: ["new-assistant"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for **suggesting** an assistant. To submit one directly, open a PR
+        following [CONTRIBUTING.md](../CONTRIBUTING.md).
+
+  - type: input
+    id: name
+    attributes:
+      label: Assistant name
+      placeholder: "SQL Query Helper"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options: [development, writing, research, vision, productivity, education, business, creative, other]
+    validations:
+      required: true
+
+  - type: textarea
+    id: instructions
+    attributes:
+      label: System prompt (instructions)
+      description: "Paste the system prompt you'd configure."
+    validations:
+      required: true
+
+  - type: input
+    id: models
+    attributes:
+      label: Recommended models (hub ids)
+      placeholder: "llama-3-1-8b-instruct, phi-3-mini-4k-instruct"
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example prompts
+      description: "2-4 prompts that show off the assistant."
+    validations:
+      required: true

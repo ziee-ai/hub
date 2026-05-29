@@ -1,0 +1,48 @@
+id: qwen2.5-vl-3b-instruct
+name: Qwen2.5-VL 3B Instruct
+display_name: Qwen2.5-VL 3B
+description: Qwen2.5-VL 3B instruction-tuned vision-language model. Supports image understanding plus tool use.
+repository_url: https://huggingface.co
+repository_path: Qwen/Qwen2.5-VL-3B-Instruct
+main_filename: model.safetensors
+file_format: safetensors
+capabilities:
+  chat: true
+  tools: true
+  vision: true
+  audio: false
+  text_embedding: false
+  image_generator: false
+  code_interpreter: true
+size_gb: 6.2
+tags:
+  - vision
+  - multimodal
+  - instruct
+  - chat
+  - image-understanding
+recommended_parameters:
+  temperature: 0.7
+  top_p: 0.8
+  top_k: 40
+  repeat_penalty: 1.05
+  context_size: 32768
+public: true
+popularity_score: 0.85
+license: Apache-2.0
+context_length: 32768
+language_support: [en, zh, ja, ko, vi, th, ar, es, fr, ru, de]
+recommended_engine: mistralrs
+recommended_engine_settings:
+  command: vision-plain
+  device_type: auto
+  max_seqs: 8
+  max_sequence_len: 32768
+  chat_template: true
+  tokenizer_json: null
+  arch: qwen2
+auth_required: true
+hub_metadata:
+  added_at: '2026-05-29'
+  contributor: phibya
+  verified: true

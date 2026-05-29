@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v1/_hub_metadata.schema.json",
+  "title": "hub_metadata",
+  "description": "Shared metadata block embedded in every hub item (model, assistant, mcp-server).",
+  "type": "object",
+  "required": ["added_at", "contributor", "verified"],
+  "properties": {
+    "added_at": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO 8601 date (YYYY-MM-DD) the item was first merged into the catalog."
+    },
+    "contributor": {
+      "type": "string",
+      "description": "GitHub handle (without the leading @) of the PR author."
+    },
+    "verified": {
+      "type": "boolean",
+      "description": "true = added by the ziee-ai team; false = community-contributed."
+    },
+    "min_ziee_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.]+)?$",
+      "description": "Optional minimum ziee-chat server version (semver). Items requiring a newer server are surfaced as Incompatible in the hub UI."
+    }
+  },
+  "additionalProperties": false
+}

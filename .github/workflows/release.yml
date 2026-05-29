@@ -1,0 +1,125 @@
+name: release hub
+
+# Build + sign + publish the hub catalog on tag push.
+#
+# Triggered by semver tags (`v0.1.0`, `v0.1.0-alpha`, …). The release tag IS
+# the catalog version; the on-disk artifacts embed it once via build-index.py.
+#
+# Per-tag artifacts:
+#   hub-v0.X.Y.tar.gz             — flat tarball of all manifests
+#   hub-v0.X.Y.tar.gz.sha256      — checksum sidecar
+#   hub-v0.X.Y.tar.gz.cosign.bundle — keyless cosign signature
+#   hub-v0.X.Y.index.json         — flat catalog used by ziee-chat UI
+#   hub-v0.X.Y.index.json.sha256
+#
+# The ziee-chat HubManager pins to a release tag, downloads both files,
+# verifies sha256 + cosign keyless identity, and unpacks into
+# <app_data_dir>/hub/v0.X.Y/.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish (e.g. v0.1.0). MUST already exist as a git tag.'
+        required: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: build + sign + publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write   # gh release upload
+      id-token: write   # cosign keyless OIDC
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: validate tag shape
+        run: |
+          set -euo pipefail
+          tag="${{ github.ref_name }}"
+          if [ -z "$tag" ] || [ "$tag" = "main" ] || [ "$tag" = "master" ]; then
+            tag="${{ github.event.inputs.tag }}"
+          fi
+          if ! echo "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$'; then
+            echo "ERROR: tag '$tag' must match semver (v0.1.0 or v0.1.0-alpha)" >&2
+            exit 1
+          fi
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          echo "VERSION=${tag#v}" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install python deps
+        run: pip install --quiet 'pyyaml>=6' 'jsonschema>=4.21' 'referencing>=0.35'
+
+      - name: validate all manifests
+        run: python3 scripts/validate.py
+
+      - name: install cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.4.0'
+
+      - name: build artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+
+          index_name="hub-${TAG}.index.json"
+          bundle_name="hub-${TAG}.tar.gz"
+
+          # 1. index.json
+          python3 scripts/build-index.py --version "$VERSION" --out "dist/${index_name}"
+
+          # 2. flat tarball of all manifests + schemas + index. Deterministic
+          # ordering + zero mtime so the tarball is byte-identical on rebuild.
+          tar --sort=name --owner=0 --group=0 --numeric-owner --mtime='@0' \
+              -czf "dist/${bundle_name}" \
+              schemas models assistants mcp-servers \
+              -C dist "${index_name}"
+
+          # 3. sha256 sidecars (relative names inside the file so verify works
+          # from any CWD).
+          ( cd dist && sha256sum "${bundle_name}" > "${bundle_name}.sha256" )
+          ( cd dist && sha256sum "${index_name}"  > "${index_name}.sha256"  )
+
+      - name: cosign sign (keyless GitHub OIDC)
+        # Keyless cosign binds the signature to THIS workflow file's OIDC
+        # identity. ziee-chat HubManager verifies via:
+        #   --certificate-identity-regexp \
+        #     '^https://github\.com/ziee-ai/hub/\.github/workflows/release\.yml@refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'
+        #   --certificate-oidc-issuer https://token.actions.githubusercontent.com
+        run: |
+          set -euo pipefail
+          cosign sign-blob --yes --bundle "dist/hub-${TAG}.tar.gz.cosign.bundle"  "dist/hub-${TAG}.tar.gz"
+          cosign sign-blob --yes --bundle "dist/hub-${TAG}.index.json.cosign.bundle" "dist/hub-${TAG}.index.json"
+
+      - name: publish to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" \
+            --title "hub $TAG" \
+            --notes "Catalog of models, assistants, and MCP servers for ziee-chat. Consumed by HubManager (sha256 + cosign keyless verify)." \
+            2>/dev/null || true
+          gh release upload "$TAG" \
+            "dist/hub-${TAG}.tar.gz" \
+            "dist/hub-${TAG}.tar.gz.sha256" \
+            "dist/hub-${TAG}.tar.gz.cosign.bundle" \
+            "dist/hub-${TAG}.index.json" \
+            "dist/hub-${TAG}.index.json.sha256" \
+            "dist/hub-${TAG}.index.json.cosign.bundle" \
+            --clobber

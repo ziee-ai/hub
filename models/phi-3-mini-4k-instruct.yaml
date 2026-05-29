@@ -1,0 +1,47 @@
+id: phi-3-mini-4k-instruct
+name: Phi-3 Mini 4K Instruct
+display_name: Phi-3 Mini
+description: Microsoft's small but capable instruction-tuned model. Great for low-resource setups.
+repository_url: https://huggingface.co
+repository_path: microsoft/Phi-3-mini-4k-instruct
+main_filename: model.safetensors
+file_format: safetensors
+capabilities:
+  chat: true
+  tools: true
+  vision: false
+  audio: false
+  text_embedding: false
+  image_generator: false
+  code_interpreter: true
+size_gb: 7.6
+tags:
+  - instruct
+  - chat
+  - small
+  - efficient
+recommended_parameters:
+  temperature: 0.6
+  top_p: 0.95
+  top_k: 50
+  repeat_penalty: 1.05
+  context_size: 4096
+public: true
+popularity_score: 0.87
+license: MIT
+context_length: 4096
+language_support: [en]
+recommended_engine: mistralrs
+recommended_engine_settings:
+  command: plain
+  device_type: auto
+  max_seqs: 8
+  max_sequence_len: 4096
+  chat_template: true
+  tokenizer_json: null
+  arch: phi
+auth_required: true
+hub_metadata:
+  added_at: '2026-05-29'
+  contributor: phibya
+  verified: true

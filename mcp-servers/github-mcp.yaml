@@ -1,0 +1,42 @@
+id: github-mcp
+name: github
+display_name: GitHub MCP Server
+description: Access GitHub repositories, issues, pull requests, and more through the GitHub API.
+category: development
+tags:
+  - github
+  - git
+  - version-control
+  - api
+transport_type: http
+environment_variables:
+  GITHUB_TOKEN: ''
+url: https://api.github.com/mcp
+headers:
+  Authorization: Bearer ${GITHUB_TOKEN}
+  Accept: application/vnd.github.v3+json
+author: Anthropic
+homepage: https://github.com/modelcontextprotocol/servers
+repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/github
+documentation_url: https://github.com/modelcontextprotocol/servers/blob/main/src/github/README.md
+version: 1.0.0
+license: MIT
+popularity_score: 92.0
+requires_desktop: false
+platform_support: [windows, macos, linux]
+tool_count: 15
+tool_categories: [repository-management, issue-tracking, code-review]
+example_tools:
+  - create_issue
+  - list_pull_requests
+  - search_repositories
+  - get_file_contents
+use_cases:
+  - Creating and managing GitHub issues
+  - Reviewing pull requests
+  - Searching repositories and code
+  - Managing repository settings
+hub_metadata:
+  added_at: '2026-05-29'
+  contributor: phibya
+  verified: true

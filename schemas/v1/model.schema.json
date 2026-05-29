@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v1/model.schema.json",
+  "title": "Model manifest",
+  "description": "A locally-runnable LLM (text/chat/embedding/vision) listed in the ziee hub.",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "description",
+    "repository_url",
+    "repository_path",
+    "main_filename",
+    "file_format",
+    "capabilities",
+    "tags",
+    "license",
+    "context_length",
+    "recommended_engine",
+    "hub_metadata"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,63}$",
+      "description": "Globally unique stable id. Lowercase. Must match the filename (id.yaml)."
+    },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "display_name": { "type": "string", "maxLength": 80 },
+    "description": { "type": "string", "minLength": 8, "maxLength": 600 },
+    "repository_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Base URL of the upstream model registry (e.g. https://huggingface.co)."
+    },
+    "repository_path": {
+      "type": "string",
+      "description": "Path within the registry (e.g. meta-llama/Llama-3.1-8B-Instruct)."
+    },
+    "main_filename": { "type": "string", "minLength": 1 },
+    "file_format": {
+      "type": "string",
+      "enum": ["safetensors", "pytorch", "gguf", "onnx", "mlx"]
+    },
+    "capabilities": {
+      "type": "object",
+      "required": ["chat", "tools", "vision", "audio", "text_embedding", "image_generator", "code_interpreter"],
+      "properties": {
+        "chat":            { "type": "boolean" },
+        "tools":           { "type": "boolean" },
+        "vision":          { "type": "boolean" },
+        "audio":           { "type": "boolean" },
+        "text_embedding":  { "type": "boolean" },
+        "image_generator": { "type": "boolean" },
+        "code_interpreter":{ "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "size_gb": { "type": "number", "minimum": 0 },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,40}$" },
+      "minItems": 1,
+      "maxItems": 20,
+      "uniqueItems": true
+    },
+    "recommended_parameters": {
+      "type": "object",
+      "properties": {
+        "temperature":    { "type": ["number", "null"] },
+        "top_p":          { "type": ["number", "null"] },
+        "top_k":          { "type": ["integer", "null"] },
+        "repeat_penalty": { "type": ["number", "null"] },
+        "context_size":   { "type": ["integer", "null"], "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "public": { "type": "boolean" },
+    "popularity_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "license": { "type": "string", "minLength": 1 },
+    "context_length": { "type": "integer", "minimum": 256 },
+    "language_support": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z]{2,3}(-[A-Za-z]+)?$" },
+      "uniqueItems": true
+    },
+    "recommended_engine": {
+      "type": "string",
+      "enum": ["mistralrs", "llamacpp"]
+    },
+    "recommended_engine_settings": {
+      "type": "object",
+      "description": "Engine-specific knobs. Schema deliberately open — engines own their own validation."
+    },
+    "quantization_options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "main_filename"],
+        "properties": {
+          "name":          { "type": "string" },
+          "main_filename": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "auth_required": { "type": "boolean" },
+    "hub_metadata": { "$ref": "_hub_metadata.schema.json" }
+  },
+  "additionalProperties": false
+}

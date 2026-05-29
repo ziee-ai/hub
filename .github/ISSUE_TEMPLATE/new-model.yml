@@ -1,0 +1,50 @@
+name: Suggest a new model
+description: Propose adding a locally-runnable LLM to the ziee hub.
+title: "[model] <name>"
+labels: ["new-model"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for **suggesting** a model. To submit one directly, open a PR
+        following [CONTRIBUTING.md](../CONTRIBUTING.md).
+
+  - type: input
+    id: name
+    attributes:
+      label: Model name
+      placeholder: "Mistral Nemo 12B Instruct"
+    validations:
+      required: true
+
+  - type: input
+    id: repo
+    attributes:
+      label: Upstream registry URL
+      placeholder: "https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: format
+    attributes:
+      label: File format
+      options: [safetensors, pytorch, gguf, onnx, mlx]
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why add it?
+      description: "What does this model do well? Who benefits?"
+    validations:
+      required: true
+
+  - type: input
+    id: license
+    attributes:
+      label: License
+      placeholder: "Apache-2.0"
+    validations:
+      required: true
