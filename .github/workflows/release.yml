@@ -73,27 +73,28 @@ jobs:
           cosign-release: 'v2.4.0'
 
       - name: build artifacts
+        # Artifact filenames are version-LESS — the GitHub Release tag IS
+        # the version. HubManager downloads `hub.tar.gz` + `hub.index.json`
+        # from whatever release it's pinned to, with no string templating.
+        # The version is still inside the artifact (`index.json` carries
+        # `hub_version`), which is the right place for consumers to read it.
         run: |
           set -euo pipefail
           mkdir -p dist
 
-          index_name="hub-${TAG}.index.json"
-          bundle_name="hub-${TAG}.tar.gz"
-
-          # 1. index.json
-          python3 scripts/build-index.py --version "$VERSION" --out "dist/${index_name}"
+          # 1. index.json (version embedded in payload)
+          python3 scripts/build-index.py --version "$VERSION" --out dist/hub.index.json
 
           # 2. flat tarball of all manifests + schemas + index. Deterministic
           # ordering + zero mtime so the tarball is byte-identical on rebuild.
           tar --sort=name --owner=0 --group=0 --numeric-owner --mtime='@0' \
-              -czf "dist/${bundle_name}" \
+              -czf dist/hub.tar.gz \
               schemas models assistants mcp-servers \
-              -C dist "${index_name}"
+              -C dist hub.index.json
 
-          # 3. sha256 sidecars (relative names inside the file so verify works
-          # from any CWD).
-          ( cd dist && sha256sum "${bundle_name}" > "${bundle_name}.sha256" )
-          ( cd dist && sha256sum "${index_name}"  > "${index_name}.sha256"  )
+          # 3. sha256 sidecars.
+          ( cd dist && sha256sum hub.tar.gz       > hub.tar.gz.sha256       )
+          ( cd dist && sha256sum hub.index.json   > hub.index.json.sha256   )
 
       - name: cosign sign (keyless GitHub OIDC)
         # Keyless cosign binds the signature to THIS workflow file's OIDC
@@ -103,8 +104,8 @@ jobs:
         #   --certificate-oidc-issuer https://token.actions.githubusercontent.com
         run: |
           set -euo pipefail
-          cosign sign-blob --yes --bundle "dist/hub-${TAG}.tar.gz.cosign.bundle"  "dist/hub-${TAG}.tar.gz"
-          cosign sign-blob --yes --bundle "dist/hub-${TAG}.index.json.cosign.bundle" "dist/hub-${TAG}.index.json"
+          cosign sign-blob --yes --bundle dist/hub.tar.gz.cosign.bundle      dist/hub.tar.gz
+          cosign sign-blob --yes --bundle dist/hub.index.json.cosign.bundle  dist/hub.index.json
 
       - name: publish to GitHub Release
         env:
@@ -125,10 +126,10 @@ jobs:
             $prerelease_flag \
             2>/dev/null || true
           gh release upload "$TAG" \
-            "dist/hub-${TAG}.tar.gz" \
-            "dist/hub-${TAG}.tar.gz.sha256" \
-            "dist/hub-${TAG}.tar.gz.cosign.bundle" \
-            "dist/hub-${TAG}.index.json" \
-            "dist/hub-${TAG}.index.json.sha256" \
-            "dist/hub-${TAG}.index.json.cosign.bundle" \
+            dist/hub.tar.gz \
+            dist/hub.tar.gz.sha256 \
+            dist/hub.tar.gz.cosign.bundle \
+            dist/hub.index.json \
+            dist/hub.index.json.sha256 \
+            dist/hub.index.json.cosign.bundle \
             --clobber

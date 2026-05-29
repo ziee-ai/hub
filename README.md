@@ -53,16 +53,19 @@ auto-refreshes every 24h, and lets admins force-refresh from the
 
 ## Verifying an artifact
 
+Artifact filenames are version-less; the tag in the URL carries the
+version (which is also embedded inside `index.json` as `hub_version`).
+
 ```bash
-gh release download v0.1.0 --pattern 'hub-v0.1.0.tar.gz*' -R ziee-ai/hub
-sha256sum -c hub-v0.1.0.tar.gz.sha256
+gh release download v0.1.0 -R ziee-ai/hub
+sha256sum -c hub.tar.gz.sha256
 
 cosign verify-blob \
-  --bundle hub-v0.1.0.tar.gz.cosign.bundle \
+  --bundle hub.tar.gz.cosign.bundle \
   --certificate-identity-regexp \
     '^https://github\.com/ziee-ai/hub/\.github/workflows/release\.yml@refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  hub-v0.1.0.tar.gz
+  hub.tar.gz
 ```
 
 ziee-chat's `HubManager` runs the same two checks in-process via the
