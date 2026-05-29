@@ -111,9 +111,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          # Pre-release tags (`v0.0.1-alpha`, `v1.0.0-rc.1`, …) ship as
+          # GitHub prereleases so ziee-chat's release discovery can skip
+          # them at boot and only auto-pin to stable tags. Admins opt in
+          # by selecting a prerelease in the /hub admin UI.
+          prerelease_flag=""
+          if echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+-'; then
+            prerelease_flag="--prerelease"
+          fi
           gh release create "$TAG" \
             --title "hub $TAG" \
             --notes "Catalog of models, assistants, and MCP servers for ziee-chat. Consumed by HubManager (sha256 + cosign keyless verify)." \
+            $prerelease_flag \
             2>/dev/null || true
           gh release upload "$TAG" \
             "dist/hub-${TAG}.tar.gz" \
