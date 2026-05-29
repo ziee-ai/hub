@@ -102,10 +102,18 @@ jobs:
         #   --certificate-identity-regexp \
         #     '^https://github\.com/ziee-ai/hub/\.github/workflows/release\.yml@refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'
         #   --certificate-oidc-issuer https://token.actions.githubusercontent.com
+        #
+        # `--new-bundle-format` writes the Sigstore Bundle protobuf-JSON
+        # format (added in cosign 2.4.0). Required for the `sigstore`
+        # Rust crate v0.13 (which HubManager uses) — the older "rekor
+        # bundle" form (`{"base64Signature": ..., "cert": ...}`) is
+        # rejected with "unrecognized field 'base64Signature'".
         run: |
           set -euo pipefail
-          cosign sign-blob --yes --bundle dist/hub.tar.gz.cosign.bundle      dist/hub.tar.gz
-          cosign sign-blob --yes --bundle dist/hub.index.json.cosign.bundle  dist/hub.index.json
+          cosign sign-blob --yes --new-bundle-format \
+              --bundle dist/hub.tar.gz.cosign.bundle      dist/hub.tar.gz
+          cosign sign-blob --yes --new-bundle-format \
+              --bundle dist/hub.index.json.cosign.bundle  dist/hub.index.json
 
       - name: publish to GitHub Release
         env:
