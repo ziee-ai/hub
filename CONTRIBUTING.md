@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for adding to the ziee-chat hub. Each entry is a tiny YAML manifest
+Thanks for adding to the ziee hub. Each entry is a tiny YAML manifest
 in one of three folders.
 
 ## Quick flow
@@ -19,7 +19,7 @@ in one of three folders.
 
 | Folder | What goes here | Schema |
 |---|---|---|
-| `models/` | Locally-runnable LLMs — chat, embedding, vision. Format restricted to safetensors / pytorch / gguf / onnx / mlx. | `schemas/v1/model.schema.json` |
+| `models/` | Locally-runnable LLMs — chat, embedding, vision. Format restricted to safetensors / pytorch / gguf. | `schemas/v1/model.schema.json` |
 | `assistants/` | Pre-configured chat assistants (system prompt + recommended model + optional MCP servers). | `schemas/v1/assistant.schema.json` |
 | `mcp-servers/` | Model-Context-Protocol servers (stdio / http / streamable-http). | `schemas/v1/mcp-server.schema.json` |
 
@@ -45,9 +45,9 @@ hub_metadata:
 entries during merge.
 
 `min_ziee_version` is optional but recommended whenever your item uses a
-feature added in a recent ziee-chat release (e.g. an MCP server requiring
+feature added in a recent ziee release (e.g. an MCP server requiring
 Streamable HTTP transport). Leaving it unset means the item is shown to
-every ziee-chat installation that knows about the hub at all.
+every ziee installation that knows about the hub at all.
 
 ## Cross-references
 
@@ -75,5 +75,5 @@ Maintainers tag `v0.X.Y` on `main` to publish a new catalog version.
 Tag → `.github/workflows/release.yml` → validate → build `index.json` →
 tarball → sha256 → cosign keyless → upload to GitHub Releases.
 
-ziee-chat installations refresh the catalog every 24h (or on-demand from
+ziee installations refresh the catalog every 24h (or on-demand from
 the `/hub` admin page).

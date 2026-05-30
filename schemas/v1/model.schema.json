@@ -40,7 +40,7 @@
     "main_filename": { "type": "string", "minLength": 1 },
     "file_format": {
       "type": "string",
-      "enum": ["safetensors", "pytorch", "gguf", "onnx", "mlx"]
+      "enum": ["safetensors", "pytorch", "gguf"]
     },
     "capabilities": {
       "type": "object",

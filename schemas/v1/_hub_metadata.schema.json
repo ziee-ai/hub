@@ -22,7 +22,7 @@
     "min_ziee_version": {
       "type": "string",
       "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.]+)?$",
-      "description": "Optional minimum ziee-chat server version (semver). Items requiring a newer server are surfaced as Incompatible in the hub UI."
+      "description": "Optional minimum ziee server version (semver). Items requiring a newer server are surfaced as Incompatible in the hub UI."
     }
   },
   "additionalProperties": false

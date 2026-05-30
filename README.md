@@ -1,17 +1,17 @@
 # ziee-ai / hub
 
 Catalog of **models**, **assistants**, and **MCP servers** surfaced inside
-[ziee-chat](https://github.com/phibya/ziee-chat)'s Hub UI.
+[ziee](https://github.com/phibya/ziee-chat)'s Hub UI.
 
 Each item is a small YAML manifest committed to this repo. Tagged releases
-publish a signed bundle (`hub-vX.Y.Z.tar.gz`) + a flat `index.json` to the
-GitHub Releases page; ziee-chat's `HubManager` downloads them, verifies
-sha256 + keyless cosign, and renders them in three tabs.
+publish a signed bundle (`hub.tar.gz`) + a flat `index.json` to the
+GitHub Releases page; ziee's `HubManager` downloads them, verifies
+sha256 + keyless cosign, and renders them in tabs.
 
 ```
-models/          5 seeded — Llama 3.1, Phi-3 Mini, Qwen2.5-VL, Llama 3.2 GGUF, Nomic embed
-assistants/      3 seeded — Code Reviewer, Creative Writer, Vision Analyst
-mcp-servers/     5 seeded — filesystem, github, postgres, brave-search, memory
+models/          locally-runnable LLMs (chat, embedding, vision)
+assistants/      pre-configured assistants (system prompt + recommended model)
+mcp-servers/     Model-Context-Protocol servers (stdio / http / streamable-http)
 schemas/v1/      JSON-Schema enforcement (model, assistant, mcp-server, hub_metadata)
 ```
 
@@ -32,10 +32,10 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full submission flow.
 ## Compatibility
 
 Every manifest carries `hub_metadata.min_ziee_version` (optional). The hub
-UI in ziee-chat shows incompatible items collapsed in an "Incompatible (N)"
-footer with the install button disabled and a tooltip naming the required
-server version. Leaving `min_ziee_version` unset means the item works on
-every ziee-chat version that knows about the catalog at all.
+UI in ziee hides items that require a newer server than the one running,
+and the install endpoint rejects them server-side. Leaving
+`min_ziee_version` unset means the item works on every ziee version that
+knows about the catalog at all.
 
 ## Releases
 
@@ -47,7 +47,7 @@ git push origin v0.1.0
 # release.yml: validate → build index.json → tar → sha256 → cosign keyless → gh release upload
 ```
 
-The release tag IS the catalog version. ziee-chat pins to a tag at boot,
+The release tag IS the catalog version. ziee pins to a tag at boot,
 auto-refreshes every 24h, and lets admins force-refresh from the
 `/hub` page.
 
@@ -68,7 +68,7 @@ cosign verify-blob \
   hub.tar.gz
 ```
 
-ziee-chat's `HubManager` runs the same two checks in-process via the
+ziee's `HubManager` runs the same two checks in-process via the
 `sigstore` Rust crate.
 
 ## Trust model
