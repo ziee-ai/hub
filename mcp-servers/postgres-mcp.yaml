@@ -15,6 +15,13 @@ args:
   - '@modelcontextprotocol/server-postgres'
 environment_variables:
   POSTGRES_CONNECTION_STRING: postgresql://user:password@localhost:5432/dbname
+# Reinstall flow: clears bun's bunx cache (see filesystem-mcp.yaml
+# for rationale; no per-package option in bun today).
+cleanup_command: bun
+cleanup_args:
+  - pm
+  - cache
+  - rm
 author: Anthropic
 homepage: https://github.com/modelcontextprotocol/servers
 repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/postgres

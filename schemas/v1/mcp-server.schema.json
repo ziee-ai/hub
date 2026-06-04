@@ -44,6 +44,15 @@
       "additionalProperties": { "type": "string" },
       "description": "Required env var keys (values are placeholders to be filled by the user)."
     },
+    "cleanup_command": {
+      "type": ["string", "null"],
+      "description": "Optional executable name (must be in the runtime's allowed-commands list, mirrors `command`) that the Reinstall workflow runs to clear this server's package cache before the next spawn auto-installs the latest version. NULL = no cleanup; reinstall just disconnects the active session. For npx-based servers: `bun` + args `[pm, cache, rm]`. For uvx-based servers: `uv` + args `[tool, uninstall, <pkg>]`."
+    },
+    "cleanup_args": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "description": "Args for cleanup_command. Required when cleanup_command is set."
+    },
     "url":     { "type": ["string", "null"], "format": "uri" },
     "headers": {
       "type": ["object", "null"],

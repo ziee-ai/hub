@@ -14,6 +14,16 @@ args:
   - '@modelcontextprotocol/server-filesystem'
   - /path/to/allowed/files
 environment_variables: {}
+# Reinstall flow: bun caches `bunx <pkg>` packages under
+# ~/.bun/install/cache/. `bun pm cache rm` is bun's documented cache-
+# clear command — no per-package option exists today, so this clears
+# the whole bunx cache (side-effect: next bunx call for any package
+# also re-fetches).
+cleanup_command: bun
+cleanup_args:
+  - pm
+  - cache
+  - rm
 author: Anthropic
 homepage: https://github.com/modelcontextprotocol/servers
 repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem
