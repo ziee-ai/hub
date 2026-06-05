@@ -9,12 +9,16 @@ tags:
   - version-control
   - api
 transport_type: http
-environment_variables:
-  GITHUB_TOKEN: ''
 url: https://api.github.com/mcp
 headers:
-  Authorization: Bearer ${GITHUB_TOKEN}
+  Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   Accept: application/vnd.github.v3+json
+required_headers:
+  - name: Authorization
+    description: GitHub personal access token with `repo` and `read:user` scopes. Include the `Bearer ` prefix when pasting.
+    placeholder: Bearer ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    is_secret: true
+    docs_url: https://github.com/settings/tokens
 author: Anthropic
 homepage: https://github.com/modelcontextprotocol/servers
 repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/github

@@ -9,11 +9,15 @@ tags:
   - api
   - research
 transport_type: http
-environment_variables:
-  BRAVE_API_KEY: ''
 url: https://api.search.brave.com/mcp
 headers:
-  X-Subscription-Token: ${BRAVE_API_KEY}
+  X-Subscription-Token: BSA-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+required_headers:
+  - name: X-Subscription-Token
+    description: Brave Search subscription token (Data for AI tier or higher).
+    placeholder: BSA-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    is_secret: true
+    docs_url: https://brave.com/search/api/
 author: Brave Software
 homepage: https://brave.com/search/api/
 repository_url: https://github.com/brave/brave-search-mcp

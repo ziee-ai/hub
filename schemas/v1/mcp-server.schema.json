@@ -42,12 +42,23 @@
     "environment_variables": {
       "type": ["object", "null"],
       "additionalProperties": { "type": "string" },
-      "description": "Required env var keys (values are placeholders to be filled by the user)."
+      "description": "Env vars passed to the subprocess (stdio transport) or referenced via ${VAR} interpolation in headers (http transports). For inputs the user must configure, see `required_env`."
     },
     "url":     { "type": ["string", "null"], "format": "uri" },
     "headers": {
       "type": ["object", "null"],
-      "additionalProperties": { "type": "string" }
+      "additionalProperties": { "type": "string" },
+      "description": "HTTP headers sent on each request (http/sse/streamable-http transports only). Values may reference env vars via ${VAR} interpolation; for inputs the user must configure, prefer `required_headers` over env-var indirection."
+    },
+    "required_env": {
+      "type": "array",
+      "description": "Declarative list of env vars the USER must configure post-install. Surfaced in the consumer UI as a 'Requires setup' affordance + structured config list. Use for stdio transports (where the subprocess reads the env vars directly). For http transports, declaring a secret here only makes sense when a header references it via ${VAR} interpolation; otherwise prefer `required_headers`.",
+      "items": { "$ref": "#/$defs/required_input" }
+    },
+    "required_headers": {
+      "type": "array",
+      "description": "Declarative list of HTTP headers the USER must configure post-install. Surfaced in the consumer UI as a 'Requires setup' affordance + structured config list. Use for http/sse/streamable-http transports where a header takes direct user input (e.g. `Authorization: Bearer <token>`, `X-Tenant-ID: <id>`). Cleaner than env-var indirection because there's no subprocess to inherit env on these transports — the header IS the surface.",
+      "items": { "$ref": "#/$defs/required_input" }
     },
     "supports_sampling":  { "type": "boolean" },
     "author":             { "type": "string", "maxLength": 80 },
@@ -107,5 +118,41 @@
         }
       }
     }
-  ]
+  ],
+  "$defs": {
+    "required_input": {
+      "type": "object",
+      "description": "A single user-configurable input the MCP server needs to function. Same shape for env vars and headers — the target surface is implied by which list (`required_env` vs `required_headers`) the entry appears in.",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "Key name. For `required_env` this is the env var name (e.g. `GITHUB_TOKEN`); for `required_headers` it's the HTTP header name (e.g. `Authorization`, `X-Tenant-ID`)."
+        },
+        "description": {
+          "type": ["string", "null"],
+          "maxLength": 400,
+          "description": "1-2 sentence human description. Rendered under the name in the consumer's hub details drawer."
+        },
+        "placeholder": {
+          "type": ["string", "null"],
+          "maxLength": 400,
+          "description": "Recommended example value. The consumer install path writes this verbatim into the new MCP server row so the user sees a realistic-looking-but-invalid value to replace. For Authorization-style headers include the full prefix (`Bearer ghp_xxxxxxxx…`) so the user pastes the right shape."
+        },
+        "is_secret": {
+          "type": "boolean",
+          "default": false,
+          "description": "True when the value carries credential material. Recommended default: true for env vars (most carry secrets); false for non-auth headers like tenant/config IDs. Set explicitly per input."
+        },
+        "docs_url": {
+          "type": ["string", "null"],
+          "format": "uri",
+          "description": "Optional link to upstream docs explaining how to obtain the value. Consumer renders as a 'Get one →' link."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }
