@@ -15,6 +15,12 @@ args:
   - '@modelcontextprotocol/server-postgres'
 environment_variables:
   POSTGRES_CONNECTION_STRING: postgresql://user:password@localhost:5432/dbname
+required_env:
+  - name: POSTGRES_CONNECTION_STRING
+    description: PostgreSQL connection string in libpq format. Use a read-only role for safety.
+    placeholder: postgresql://user:password@localhost:5432/dbname
+    is_secret: true
+    docs_url: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
 author: Anthropic
 homepage: https://github.com/modelcontextprotocol/servers
 repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/postgres
