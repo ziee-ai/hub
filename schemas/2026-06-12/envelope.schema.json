@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ziee.ai/hub/schemas/v2/envelope.schema.json",
-  "title": "Hub v2 Envelope",
-  "description": "Common envelope fields for v2 ziee-native model + assistant manifests. MCP server manifests do NOT extend this — they are strict server.json (which carries its own name/version fields).",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/envelope.schema.json",
+  "title": "Hub Envelope",
+  "description": "Common envelope fields for ziee-native model + assistant manifests. MCP server manifests do NOT extend this — they are strict server.json (which carries its own name/version fields).",
   "type": "object",
   "properties": {
     "$schema": {

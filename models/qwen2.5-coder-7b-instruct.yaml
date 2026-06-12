@@ -12,7 +12,7 @@ _hub_curation:
   min_ziee_version: null
   summary: Alibaba's Qwen2.5-Coder 7B — code generation, completion, and reasoning across 40+ languages.
 
-$schema: /schemas/v2/model.schema.json
+$schema: /schemas/2026-06-12/model.schema.json
 name: io.github.phibya/qwen2.5-coder-7b-instruct
 version: 1.0.0
 display_name: Qwen2.5-Coder 7B

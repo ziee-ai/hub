@@ -12,7 +12,7 @@ _hub_curation:
   min_ziee_version: null
   summary: Expert code reviewer with a security-and-best-practices focus.
 
-$schema: /schemas/v2/assistant.schema.json
+$schema: /schemas/2026-06-12/assistant.schema.json
 name: io.github.phibya/code-reviewer
 version: 1.0.0
 display_name: Code Reviewer

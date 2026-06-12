@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate every hub source YAML against its JSON Schema and cross-reference rules.
 
-Usage: scripts/validate.py [--repo /path/to/hub] [--schemas schemas/v2]
+Usage: scripts/validate.py [--repo /path/to/hub] [--schemas schemas/2026-06-12]
 
 Exits non-zero on the first error. Intended to run in CI (pr-lint.yml) and
 locally before opening a PR.
@@ -11,9 +11,9 @@ validator extracts that block and validates the *remainder* against the
 matching JSON Schema — this is the same payload that will land in
 `dist/<type>/<namespace>/<leaf>/<version>.json`. For MCP servers the
 remainder is strict server.json (vendored from modelcontextprotocol.io);
-for models + assistants it's the ziee v2 shape.
+for models + assistants it's the ziee hub shape.
 
-By default validates against `schemas/v2/`. Pass `--schemas schemas/v1` to
+By default validates against `schemas/2026-06-12/`. Pass `--schemas schemas/v1` to
 exercise the legacy validator during a transition.
 """
 from __future__ import annotations
@@ -174,8 +174,8 @@ def main() -> int:
     parser.add_argument("--repo", default=str(Path(__file__).resolve().parents[1]))
     parser.add_argument(
         "--schemas",
-        default="schemas/v2",
-        help="Schemas directory relative to --repo (default: schemas/v2)",
+        default="schemas/2026-06-12",
+        help="Schemas directory relative to --repo (default: schemas/2026-06-12)",
     )
     args = parser.parse_args()
     repo = Path(args.repo).resolve()

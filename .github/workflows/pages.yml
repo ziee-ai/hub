@@ -10,7 +10,7 @@ name: pages
 #
 # Output layout (deployed to https://ziee-ai.github.io/hub/):
 #   /index.json                          # the Catalog (`schema_version: 2`)
-#   /schemas/v2/*.schema.json            # versioned JSON Schemas
+#   /schemas/2026-06-12/*.schema.json            # versioned JSON Schemas
 #   /models/<id>/<version>.json          # full per-entry manifest
 #   /assistants/<id>/<version>.json
 #   /mcp-servers/<id>/<version>.json
@@ -24,7 +24,7 @@ on:
       - 'models/**'
       - 'assistants/**'
       - 'mcp-servers/**'
-      - 'schemas/v2/**'
+      - 'schemas/2026-06-12/**'
       - 'scripts/build-pages.py'
       - 'scripts/validate.py'
       - '.github/workflows/pages.yml'

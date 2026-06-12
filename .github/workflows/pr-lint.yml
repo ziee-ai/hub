@@ -42,7 +42,7 @@ jobs:
       - name: install deps
         run: pip install --quiet 'pyyaml>=6' 'jsonschema>=4.21' 'referencing>=0.35'
 
-      - name: validate manifests (v2)
+      - name: validate manifests
         run: python3 scripts/validate.py
 
       - name: build Pages layout (smoke)

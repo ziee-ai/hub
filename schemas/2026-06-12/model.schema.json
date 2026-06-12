@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ziee.ai/hub/schemas/v2/model.schema.json",
-  "title": "Hub v2 Model Manifest",
-  "description": "Per-entry manifest for a HubModel. v2 keys the entry off the envelope's reverse-DNS `name` (and `version`). The body is now parallel to the MCP shape: `repository` describes the upstream source-of-truth, `sources[]` lists the installable distributions (each carrying its own quantizations[]), and `dependencies[]` is the informational cross-entry reference list.",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/model.schema.json",
+  "title": "Hub Model Manifest",
+  "description": "Per-entry manifest for a HubModel. Keys the entry off the envelope's reverse-DNS `name` (and `version`). The body is parallel to the MCP shape: `repository` describes the upstream source-of-truth, `sources[]` lists the installable distributions (each carrying its own quantizations[]), and `dependencies[]` is the informational cross-entry reference list.",
   "allOf": [
     { "$ref": "envelope.schema.json" }
   ],
@@ -54,7 +54,7 @@
     },
     "dependencies": {
       "type": "array",
-      "description": "Informational cross-entry references. v2 does NOT auto-install dependencies; the FE surfaces them as 'Works best with' chips.",
+      "description": "Informational cross-entry references. Does NOT auto-install dependencies; the FE surfaces them as 'Works best with' chips.",
       "items": { "$ref": "dependency.schema.json" },
       "default": []
     },

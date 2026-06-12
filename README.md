@@ -21,7 +21,7 @@ schemas/v1/      JSON-Schema enforcement (model, assistant, mcp-server, hub_meta
 |--------------------|--------------------------------------------------------------------|----------------------|
 | `just validate`    | Lint every manifest against its JSON Schema. Fast, no Docker.      | python3 + jsonschema |
 | `just build-pages` | Build `dist/` locally (same script the workflow runs).             | python3              |
-| `just test-pages`  | Execute `.github/workflows/pages.yml` end-to-end via `act`+Docker, then assert the produced `dist/` tree (file count, schemas, reverse-DNS names, v2 entry shape). | Docker Desktop running + [`act`](https://github.com/nektos/act) |
+| `just test-pages`  | Execute `.github/workflows/pages.yml` end-to-end via `act`+Docker, then assert the produced `dist/` tree (file count, schemas, reverse-DNS names, entry shape). | Docker Desktop running + [`act`](https://github.com/nektos/act) |
 
 `just test-pages` hard-fails (exit 1) if the Docker daemon is not running.
 If `act` is missing it tries `brew install act` once; otherwise it fails

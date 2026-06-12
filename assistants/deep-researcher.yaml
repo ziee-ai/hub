@@ -11,7 +11,7 @@ _hub_curation:
   min_ziee_version: '99.0.0'
   summary: Multi-step research assistant. Pinned to a future ziee-chat that ships the parallel sub-agent runtime.
 
-$schema: /schemas/v2/assistant.schema.json
+$schema: /schemas/2026-06-12/assistant.schema.json
 name: io.github.phibya/deep-researcher
 version: 1.0.0
 display_name: Deep Researcher

@@ -14,7 +14,7 @@ _hub_curation:
   min_ziee_version: null
   summary: Meta's Llama 3.2 3B instruction-tuned model in GGUF format. Multiple quantizations available.
 
-$schema: /schemas/v2/model.schema.json
+$schema: /schemas/2026-06-12/model.schema.json
 name: io.github.phibya/llama-3-2-3b-instruct-gguf
 version: 1.0.0
 display_name: Llama 3.2 3B

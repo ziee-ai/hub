@@ -151,12 +151,12 @@ verify_dist() {
 
   [[ -f dist/index.json ]] \
     || fail "missing dist/index.json"
-  [[ -f dist/schemas/v2/mcp-server.schema.json ]] \
-    || fail "missing dist/schemas/v2/mcp-server.schema.json (vendored MCP schema)"
-  [[ -f dist/schemas/v2/model.schema.json ]] \
-    || fail "missing dist/schemas/v2/model.schema.json"
-  [[ -f dist/schemas/v2/assistant.schema.json ]] \
-    || fail "missing dist/schemas/v2/assistant.schema.json"
+  [[ -f dist/schemas/2026-06-12/mcp-server.schema.json ]] \
+    || fail "missing dist/schemas/2026-06-12/mcp-server.schema.json (vendored MCP schema)"
+  [[ -f dist/schemas/2026-06-12/model.schema.json ]] \
+    || fail "missing dist/schemas/2026-06-12/model.schema.json"
+  [[ -f dist/schemas/2026-06-12/assistant.schema.json ]] \
+    || fail "missing dist/schemas/2026-06-12/assistant.schema.json"
 
   local item_count
   item_count="$(python3 -c 'import json; print(len(json.load(open("dist/index.json"))["items"]))')"
@@ -203,7 +203,7 @@ for path in paths:
 
 print(f'checked {len(paths)} MCP entries')
 PY
-  ok "MCP entries pass v2 shape check"
+  ok "MCP entries pass shape check"
 
   # Catalog-level sanity: schema_version + hub_version present.
   python3 - <<'PY' || fail "catalog metadata check failed"

@@ -12,7 +12,7 @@ _hub_curation:
   min_ziee_version: null
   summary: Specialized assistant for image and visual content analysis.
 
-$schema: /schemas/v2/assistant.schema.json
+$schema: /schemas/2026-06-12/assistant.schema.json
 name: io.github.phibya/vision-analyst
 version: 1.0.0
 display_name: Vision Analyst

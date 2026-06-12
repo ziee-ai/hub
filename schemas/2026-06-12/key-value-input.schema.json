@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ziee.ai/hub/schemas/v2/key-value-input.schema.json",
-  "title": "Hub v2 KeyValueInput",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/key-value-input.schema.json",
+  "title": "Hub KeyValueInput",
   "description": "Shared input shape for environment variables / headers / source-time secrets. Extracted from the official MCP server.json KeyValueInput definition (https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json#/definitions/KeyValueInput) so models can reuse the same wire shape for source-time credentials (e.g. HUGGINGFACE_API_KEY) as MCP packages do for runtime env.",
   "type": "object",
   "required": ["name"],

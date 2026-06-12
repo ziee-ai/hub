@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ziee.ai/hub/schemas/v2/dependency.schema.json",
-  "title": "Hub v2 Dependency",
-  "description": "Cross-entry dependency reference used by both HubModel.dependencies[] and HubAssistant.dependencies[]. Purely informational in v2 — no auto-installer; the FE surfaces dependencies as 'Works best with' chips.",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/dependency.schema.json",
+  "title": "Hub Dependency",
+  "description": "Cross-entry dependency reference used by both HubModel.dependencies[] and HubAssistant.dependencies[]. Purely informational — no auto-installer; the FE surfaces dependencies as 'Works best with' chips.",
   "type": "object",
   "required": ["kind", "name", "versionRange"],
   "properties": {

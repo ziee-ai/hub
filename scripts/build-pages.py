@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Build the v2 Pages layout for the ziee hub registry.
+"""Build the Pages layout for the ziee hub registry.
 
 Output shape (under --out):
 
   dist/
   ├── index.json                                           # Catalog
-  ├── schemas/v2/*.json                                    # copied verbatim
+  ├── schemas/2026-06-12/*.json                                    # copied verbatim
   ├── models/<namespace>/<leaf>/<version>.json             # full manifest
   ├── assistants/<namespace>/<leaf>/<version>.json
   └── mcp-servers/<namespace>/<leaf>/<version>.json
@@ -14,7 +14,7 @@ Steps:
   1. Load + validate every YAML under models/, assistants/, mcp-servers/. The
      source YAMLs carry a build-only `_hub_curation:` block — we extract that,
      leave the rest as the published manifest, and validate the published
-     remainder against schemas/v2/*.schema.json. Fail the build on any
+     remainder against schemas/2026-06-12/*.schema.json. Fail the build on any
      schema violation.
   2. (optional, with --ingest-mcp-registry) Paginate
      https://registry.modelcontextprotocol.io/v0/servers, filter to entries
@@ -23,7 +23,7 @@ Steps:
      curation block for index emission.
   3. Merge ziee-native + ingested (collision on `name` → ziee-native wins).
   4. Emit dist/index.json (Catalog), dist/<type>/<namespace>/<leaf>/<version>.json
-     (full manifests, with `_hub_curation` stripped), and copy schemas/v2/*.json
+     (full manifests, with `_hub_curation` stripped), and copy schemas/2026-06-12/*.json
      verbatim.
 
 Fail-soft on the MCP registry fetch — if --ingest-mcp-registry is unset OR
@@ -432,7 +432,9 @@ def write_manifest(out_dir: Path, category: str, body: dict) -> Path:
 
 
 def copy_schemas(schemas_dir: Path, out_dir: Path) -> None:
-    target = out_dir / "schemas" / "v2"
+    # Mirror the schemas-dir basename into dist/ so the dated path
+    # (e.g. schemas/2026-06-12/) is preserved end-to-end.
+    target = out_dir / "schemas" / schemas_dir.name
     target.mkdir(parents=True, exist_ok=True)
     for schema_path in schemas_dir.glob("*.schema.json"):
         shutil.copy2(schema_path, target / schema_path.name)
@@ -458,8 +460,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--schemas",
-        default="schemas/v2",
-        help="Schemas directory relative to --repo (default: schemas/v2).",
+        default="schemas/2026-06-12",
+        help="Schemas directory relative to --repo (default: schemas/2026-06-12).",
     )
     args = parser.parse_args()
     repo = Path(args.repo).resolve()

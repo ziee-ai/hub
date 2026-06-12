@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ziee.ai/hub/schemas/v2/source.schema.json",
-  "title": "Hub v2 Model Source",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/source.schema.json",
+  "title": "Hub Model Source",
   "description": "Per-source entry inside a HubModel.sources[] list. Models stay parallel to MCP packages[]: one model can ship from multiple registries (huggingface / s3 / url / local) and each source advertises its own file format, runtime hint, context window, optional environment variables, and its own list of quantizations.",
   "type": "object",
   "required": [

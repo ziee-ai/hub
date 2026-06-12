@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ziee.ai/hub/schemas/v2/assistant.schema.json",
-  "title": "Hub v2 Assistant Manifest",
-  "description": "Per-entry manifest for a HubAssistant. v2 keys the entry off the envelope's reverse-DNS `name` (and `version`). The body drops the v1 `recommended_models` / `recommended_mcp_servers` / `use_cases` / `example_prompts` / `popularity_score` fields and replaces the recommended_* pair with a typed `dependencies[]` list using reverse-DNS names and semver ranges.",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/assistant.schema.json",
+  "title": "Hub Assistant Manifest",
+  "description": "Per-entry manifest for a HubAssistant. Keys the entry off the envelope's reverse-DNS `name` (and `version`). Uses a typed `dependencies[]` list (reverse-DNS names + semver ranges) in place of the older `recommended_models` / `recommended_mcp_servers` / `use_cases` / `example_prompts` / `popularity_score` fields.",
   "allOf": [
     { "$ref": "envelope.schema.json" }
   ],
@@ -30,7 +30,7 @@
     },
     "dependencies": {
       "type": "array",
-      "description": "Informational cross-entry references (models + mcp-servers this assistant works best with). v2 does NOT auto-install dependencies; the FE surfaces them as 'Works best with' chips.",
+      "description": "Informational cross-entry references (models + mcp-servers this assistant works best with). Does NOT auto-install dependencies; the FE surfaces them as 'Works best with' chips.",
       "items": { "$ref": "dependency.schema.json" },
       "default": []
     },
