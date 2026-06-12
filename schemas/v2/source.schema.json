@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v2/source.schema.json",
+  "title": "Hub v2 Model Source",
+  "description": "Per-source entry inside a HubModel.sources[] list. Models stay parallel to MCP packages[]: one model can ship from multiple registries (huggingface / s3 / url / local) and each source advertises its own file format, runtime hint, context window, optional environment variables, and its own list of quantizations.",
+  "type": "object",
+  "required": [
+    "registryType",
+    "identifier",
+    "version",
+    "fileFormat",
+    "quantizations"
+  ],
+  "properties": {
+    "registryType": {
+      "type": "string",
+      "description": "Registry kind. Mirrors McpPackage.registryType.",
+      "enum": ["huggingface", "s3", "url", "local"]
+    },
+    "identifier": {
+      "type": "string",
+      "description": "Source-specific identifier: a HuggingFace repo path (e.g. 'meta-llama/Llama-3.2-3B-Instruct-GGUF'), an S3 path, or a direct URL.",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Source-specific revision (e.g. a Git branch/tag/commit, an S3 object version). Use 'main' when unpinned.",
+      "minLength": 1
+    },
+    "fileFormat": {
+      "type": "string",
+      "description": "On-disk file format produced by this source.",
+      "enum": ["gguf", "safetensors", "pytorch"]
+    },
+    "runtimeHint": {
+      "type": ["string", "null"],
+      "description": "Suggested local runtime for this source's files (e.g. 'llamacpp', 'mistralrs')."
+    },
+    "contextLength": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "description": "Native context length for this source's checkpoint. Per-source because different distributions of the same model can ship different windows."
+    },
+    "environmentVariables": {
+      "type": "array",
+      "description": "Source-time environment variables (e.g. HUGGINGFACE_API_KEY for gated repos). Same shape used by McpPackage.environmentVariables and the various MCP transports — see key-value-input.schema.json.",
+      "items": { "$ref": "key-value-input.schema.json" },
+      "default": []
+    },
+    "quantizations": {
+      "type": "array",
+      "description": "One or more concrete file variants the user can pick from. Single-file models still list a single entry here.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "mainFile", "isDefault"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Quantization label as it appears to the user (e.g. 'Q4_K_M', 'Q5_K_M', 'f16', 'fp16').",
+            "minLength": 1
+          },
+          "mainFile": {
+            "type": "string",
+            "description": "File-format entrypoint name inside the source repo / package.",
+            "minLength": 1
+          },
+          "sizeGb": {
+            "type": ["number", "null"],
+            "minimum": 0,
+            "description": "On-disk size in GiB; informational, used by the FE for the download confirmation prompt."
+          },
+          "fileSha256": {
+            "type": ["string", "null"],
+            "pattern": "^[a-f0-9]{64}$",
+            "description": "Optional SHA-256 over the main file for download integrity verification."
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Exactly one quantization per source SHOULD have isDefault=true; consumers pick that one absent an explicit user choice."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

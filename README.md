@@ -15,6 +15,27 @@ mcp-servers/     Model-Context-Protocol servers (stdio / http / streamable-http)
 schemas/v1/      JSON-Schema enforcement (model, assistant, mcp-server, hub_metadata)
 ```
 
+## Testing
+
+| Command            | What it does                                                       | Needs                |
+|--------------------|--------------------------------------------------------------------|----------------------|
+| `just validate`    | Lint every manifest against its JSON Schema. Fast, no Docker.      | python3 + jsonschema |
+| `just build-pages` | Build `dist/` locally (same script the workflow runs).             | python3              |
+| `just test-pages`  | Execute `.github/workflows/pages.yml` end-to-end via `act`+Docker, then assert the produced `dist/` tree (file count, schemas, reverse-DNS names, v2 entry shape). | Docker Desktop running + [`act`](https://github.com/nektos/act) |
+
+`just test-pages` hard-fails (exit 1) if the Docker daemon is not running.
+If `act` is missing it tries `brew install act` once; otherwise it fails
+with install instructions. The first run pulls the
+`catthehacker/ubuntu:act-latest` image (~1-2 GB) and takes 2-5 minutes;
+later runs reuse the cache.
+
+Install requirements on macOS:
+
+```bash
+# Docker Desktop: https://www.docker.com/products/docker-desktop
+brew install act just
+```
+
 ## Contributing a new item
 
 1. Pick the right folder (`models/`, `assistants/`, `mcp-servers/`).

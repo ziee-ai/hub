@@ -1,0 +1,92 @@
+name: pages
+
+# Build + publish the hub catalog as a GitHub Pages site.
+#
+# Trigger paths:
+#   - push to `main`     → publish contributor-authored changes immediately.
+#   - schedule (daily)   → re-pull the MCP registry so newly-published servers
+#                          appear without a manual push.
+#   - workflow_dispatch  → manual rerun (e.g. after a registry hotfix).
+#
+# Output layout (deployed to https://ziee-ai.github.io/hub/):
+#   /index.json                          # the Catalog (`schema_version: 2`)
+#   /schemas/v2/*.schema.json            # versioned JSON Schemas
+#   /models/<id>/<version>.json          # full per-entry manifest
+#   /assistants/<id>/<version>.json
+#   /mcp-servers/<id>/<version>.json
+#
+# No cosign / no tarball / no GitHub Release. Trust = HTTPS to Pages.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'models/**'
+      - 'assistants/**'
+      - 'mcp-servers/**'
+      - 'schemas/v2/**'
+      - 'scripts/build-pages.py'
+      - 'scripts/validate.py'
+      - '.github/workflows/pages.yml'
+  schedule:
+    - cron: '17 3 * * *'   # daily ~03:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: build catalog
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install python deps
+        run: pip install --quiet 'pyyaml>=6' 'jsonschema>=4.21' 'referencing>=0.35'
+
+      - name: validate all manifests
+        run: python3 scripts/validate.py
+
+      - name: build pages layout
+        # `--ingest-mcp-registry` paginates registry.modelcontextprotocol.io
+        # and merges installable entries; if the registry is unreachable the
+        # build still succeeds with a ziee-native-only catalog.
+        run: |
+          set -euo pipefail
+          python3 scripts/build-pages.py \
+              --out dist \
+              --version 2.0.0 \
+              --ingest-mcp-registry
+
+      - name: configure pages
+        uses: actions/configure-pages@v5
+
+      - name: upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: deploy to Pages
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v2/dependency.schema.json",
+  "title": "Hub v2 Dependency",
+  "description": "Cross-entry dependency reference used by both HubModel.dependencies[] and HubAssistant.dependencies[]. Purely informational in v2 — no auto-installer; the FE surfaces dependencies as 'Works best with' chips.",
+  "type": "object",
+  "required": ["kind", "name", "versionRange"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "description": "Category of the referenced entry. Mirrors the catalog category enum.",
+      "enum": ["model", "mcp-server"]
+    },
+    "name": {
+      "type": "string",
+      "description": "Reverse-DNS name of the referenced entry. MUST equal an existing entry's envelope.name.",
+      "pattern": "^[a-z0-9.-]+/[a-z0-9._-]+$"
+    },
+    "versionRange": {
+      "type": "string",
+      "description": "npm-style semver range, or '*' for any version. Evaluated by the FE against the referenced entry's envelope.version.",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false
+}

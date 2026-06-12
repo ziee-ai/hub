@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v2/envelope.schema.json",
+  "title": "Hub v2 Envelope",
+  "description": "Common envelope fields for v2 ziee-native model + assistant manifests. MCP server manifests do NOT extend this — they are strict server.json (which carries its own name/version fields).",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "URL of the JSON Schema this manifest claims to conform to. Informational."
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9.-]+/[a-z0-9._-]+$",
+      "description": "Reverse-DNS canonical id, unique across sources. ziee-native entries use io.github.<contributor>/<leaf>; the part before the slash is the namespace, the part after is the leaf used for path layout."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:[-+].*)?$",
+      "description": "Per-entry semver. Drives the per-row update signal in the installed view."
+    },
+    "_meta": {
+      "type": "object",
+      "description": "Namespaced provenance / extras. Reserved for a future phase.",
+      "additionalProperties": true
+    }
+  },
+  "required": ["name", "version"],
+  "additionalProperties": true
+}

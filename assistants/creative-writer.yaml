@@ -1,34 +1,45 @@
-id: creative-writer
-name: Creative Writer
+_hub_curation:
+  title: Creative Writer
+  category: writing
+  tags:
+    - writing
+    - creative
+    - storytelling
+    - content
+  verified: true
+  added_at: '2026-05-29'
+  contributor: phibya
+  min_ziee_version: null
+  summary: Professional creative writer for stories, articles, and content.
+
+$schema: /schemas/v2/assistant.schema.json
+name: io.github.phibya/creative-writer
+version: 1.0.0
 display_name: Creative Writer
 description: Professional creative writer for stories, articles, and content.
+
 instructions: |
   You are a professional creative writer with expertise in storytelling, content
   creation, and engaging writing. Create compelling, well-structured content tailored
   to the user's tone, audience, and length requirements.
+
 parameters:
   temperature: 0.8
   max_tokens: 4096
+
 category: writing
 tags:
   - writing
   - creative
   - storytelling
   - content
-recommended_models:
-  - llama-3-1-8b-instruct
-  - phi-3-mini-4k-instruct
-popularity_score: 0.75
+
+dependencies:
+  - kind: model
+    name: io.github.phibya/llama-3-1-8b-instruct
+    versionRange: "*"
+  - kind: model
+    name: io.github.phibya/phi-3-mini-4k-instruct
+    versionRange: "*"
+
 author: Ziee Team
-use_cases:
-  - Story writing
-  - Blog posts
-  - Creative marketing copy
-example_prompts:
-  - Write a short story about time travel.
-  - Create an engaging blog post about productivity.
-  - Draft creative marketing copy for a new product.
-hub_metadata:
-  added_at: '2026-05-29'
-  contributor: phibya
-  verified: true

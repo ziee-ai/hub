@@ -1,46 +1,40 @@
-id: github-mcp
-name: github
-display_name: GitHub MCP Server
-description: Access GitHub repositories, issues, pull requests, and more through the GitHub API.
-category: development
-tags:
-  - github
-  - git
-  - version-control
-  - api
-transport_type: http
-url: https://api.github.com/mcp
-headers:
-  Authorization: Bearer ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  Accept: application/vnd.github.v3+json
-required_headers:
-  - name: Authorization
-    description: GitHub personal access token with `repo` and `read:user` scopes. Include the `Bearer ` prefix when pasting.
-    placeholder: Bearer ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    is_secret: true
-    docs_url: https://github.com/settings/tokens
-author: Anthropic
-homepage: https://github.com/modelcontextprotocol/servers
-repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/github
-documentation_url: https://github.com/modelcontextprotocol/servers/blob/main/src/github/README.md
-version: 1.0.0
-license: MIT
-popularity_score: 92.0
-requires_desktop: false
-platform_support: [windows, macos, linux]
-tool_count: 15
-tool_categories: [repository-management, issue-tracking, code-review]
-example_tools:
-  - create_issue
-  - list_pull_requests
-  - search_repositories
-  - get_file_contents
-use_cases:
-  - Creating and managing GitHub issues
-  - Reviewing pull requests
-  - Searching repositories and code
-  - Managing repository settings
-hub_metadata:
+_hub_curation:
+  title: GitHub MCP Server
+  category: developer
+  tags:
+    - github
+    - git
+    - version-control
+    - api
+    - streamable-http
+  verified: true
   added_at: '2026-05-29'
   contributor: phibya
-  verified: true
+  min_ziee_version: null
+  summary: Access GitHub repositories, issues, and pull requests over the official GitHub MCP endpoint.
+
+$schema: https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json
+name: io.github.github/mcp
+description: Access GitHub repos, issues, and pull requests via the official GitHub MCP endpoint.
+version: 1.0.0
+repository:
+  url: https://github.com/github/github-mcp-server
+  source: github
+websiteUrl: https://github.com/github/github-mcp-server
+remotes:
+  - type: streamable-http
+    url: https://api.githubcopilot.com/mcp/
+    headers:
+      - name: Authorization
+        value: Bearer {GITHUB_PERSONAL_ACCESS_TOKEN}
+        description: Bearer token; interpolates GITHUB_PERSONAL_ACCESS_TOKEN at runtime.
+        isSecret: true
+        variables:
+          GITHUB_PERSONAL_ACCESS_TOKEN:
+            description: GitHub personal access token (classic or fine-grained) with appropriate scopes for the tools used.
+            isRequired: true
+            isSecret: true
+            format: string
+      - name: Accept
+        value: application/vnd.github.v3+json
+        isSecret: false

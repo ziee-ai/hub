@@ -1,39 +1,51 @@
-id: sql-helper
-name: SQL Helper
+_hub_curation:
+  title: SQL Helper
+  category: development
+  tags:
+    - sql
+    - database
+    - queries
+  verified: true
+  added_at: '2026-05-29'
+  contributor: phibya
+  min_ziee_version: null
+  summary: Writes, explains, and optimizes SQL across Postgres, MySQL, and SQLite dialects.
+
+$schema: /schemas/v2/assistant.schema.json
+name: io.github.phibya/sql-helper
+version: 1.0.0
 display_name: SQL Helper
 description: Writes, explains, and optimizes SQL across Postgres, MySQL, and SQLite dialects.
+
 instructions: |
   You are a SQL expert. Help users write correct, efficient, and readable SQL.
   When asked for a query: state your assumptions about the schema, give the
   query, then a one-line explanation of what it does and any indexes it relies
   on. Prefer standard SQL; call out dialect-specific syntax when you use it.
   Never run destructive statements without flagging them first.
+
 parameters:
   temperature: 0.2
   max_tokens: 2048
+
 category: development
 tags:
   - sql
   - database
   - queries
-recommended_models:
-  - qwen2.5-coder-7b-instruct
-  - llama-3-1-8b-instruct
-recommended_mcp_servers:
-  - postgres-mcp
+
 capabilities_required:
   - tools
-popularity_score: 0.8
+
+dependencies:
+  - kind: model
+    name: io.github.phibya/qwen2.5-coder-7b-instruct
+    versionRange: "*"
+  - kind: model
+    name: io.github.phibya/llama-3-1-8b-instruct
+    versionRange: "*"
+  - kind: mcp-server
+    name: io.github.modelcontextprotocol/postgres
+    versionRange: "*"
+
 author: Ziee Team
-use_cases:
-  - Writing and debugging SQL queries
-  - Explaining slow queries + suggesting indexes
-  - Translating between SQL dialects
-example_prompts:
-  - Write a query to find the top 5 customers by total order value last quarter.
-  - Why is this JOIN slow, and what index would help?
-  - Convert this Postgres query to MySQL.
-hub_metadata:
-  added_at: '2026-05-29'
-  contributor: phibya
-  verified: true

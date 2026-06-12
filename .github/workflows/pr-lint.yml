@@ -1,7 +1,7 @@
 name: pr-lint
 
 # Run JSON-Schema validation + cross-reference checks on every PR that touches
-# the catalog. Builds index.json as a sanity check (no upload).
+# the catalog. Build the Pages layout as a sanity check (no upload).
 
 on:
   pull_request:
@@ -42,11 +42,16 @@ jobs:
       - name: install deps
         run: pip install --quiet 'pyyaml>=6' 'jsonschema>=4.21' 'referencing>=0.35'
 
-      - name: validate manifests
+      - name: validate manifests (v2)
         run: python3 scripts/validate.py
 
-      - name: build index.json (smoke)
+      - name: build Pages layout (smoke)
+        # Skip --ingest-mcp-registry on PR builds so the smoke test is
+        # network-independent + deterministic across reruns.
         run: |
-          mkdir -p dist
-          python3 scripts/build-index.py --version 0.0.0-pr --out dist/hub-pr.index.json
-          head -40 dist/hub-pr.index.json
+          set -euo pipefail
+          python3 scripts/build-pages.py --out dist --version 2.0.0-pr
+          echo '--- dist/index.json (first 40 lines) ---'
+          head -40 dist/index.json
+          echo '--- dist tree ---'
+          find dist -type f | sort

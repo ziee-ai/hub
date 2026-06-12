@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v2/model.schema.json",
+  "title": "Hub v2 Model Manifest",
+  "description": "Per-entry manifest for a HubModel. v2 keys the entry off the envelope's reverse-DNS `name` (and `version`). The body is now parallel to the MCP shape: `repository` describes the upstream source-of-truth, `sources[]` lists the installable distributions (each carrying its own quantizations[]), and `dependencies[]` is the informational cross-entry reference list.",
+  "allOf": [
+    { "$ref": "envelope.schema.json" }
+  ],
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "display_name",
+    "sources"
+  ],
+  "properties": {
+    "display_name": { "type": "string" },
+    "description": { "type": ["string", "null"] },
+    "repository": {
+      "type": ["object", "null"],
+      "description": "Upstream source-of-truth metadata. Shape mirrors the official MCP server.json Repository definition.",
+      "required": ["url", "source"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Repository URL for browsing source code or model weights."
+        },
+        "source": {
+          "type": "string",
+          "description": "Repository hosting service identifier (e.g. 'huggingface', 'github')."
+        },
+        "id": {
+          "type": "string",
+          "description": "Repository identifier from the hosting service (e.g. HF repo path, GitHub repo ID)."
+        },
+        "subfolder": {
+          "type": "string",
+          "description": "Optional relative path inside the repository to a nested entry."
+        }
+      },
+      "additionalProperties": false
+    },
+    "websiteUrl": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "Project homepage or model card URL."
+    },
+    "sources": {
+      "type": "array",
+      "description": "One or more concrete distributions of this model. Each entry's quantizations[] enumerates the file variants the user can pick from.",
+      "minItems": 1,
+      "items": { "$ref": "source.schema.json" }
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Informational cross-entry references. v2 does NOT auto-install dependencies; the FE surfaces them as 'Works best with' chips.",
+      "items": { "$ref": "dependency.schema.json" },
+      "default": []
+    },
+    "capabilities": {
+      "type": ["object", "null"],
+      "description": "Model-wide capability flags. Source-independent.",
+      "properties": {
+        "vision": { "type": "boolean" },
+        "audio": { "type": "boolean" },
+        "tools": { "type": "boolean" },
+        "code_interpreter": { "type": "boolean" },
+        "chat": { "type": "boolean" },
+        "text_embedding": { "type": "boolean" },
+        "image_generator": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "recommended_parameters": { "type": ["object", "null"] },
+    "author": { "type": ["string", "null"] },
+    "license": { "type": ["string", "null"] },
+    "language_support": {
+      "type": ["array", "null"],
+      "items": { "type": "string" }
+    }
+  }
+}

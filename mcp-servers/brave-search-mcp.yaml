@@ -1,45 +1,37 @@
-id: brave-search-mcp
-name: brave-search
-display_name: Brave Search MCP Server
-description: Perform web searches using the Brave Search API for up-to-date information.
-category: search
-tags:
-  - search
-  - web
-  - api
-  - research
-transport_type: http
-url: https://api.search.brave.com/mcp
-headers:
-  X-Subscription-Token: BSA-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-required_headers:
-  - name: X-Subscription-Token
-    description: Brave Search subscription token (Data for AI tier or higher).
-    placeholder: BSA-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    is_secret: true
-    docs_url: https://brave.com/search/api/
-author: Brave Software
-homepage: https://brave.com/search/api/
-repository_url: https://github.com/brave/brave-search-mcp
-documentation_url: https://api.search.brave.com/docs
-version: 1.2.0
-license: Apache-2.0
-popularity_score: 88.0
-requires_desktop: false
-platform_support: [windows, macos, linux]
-tool_count: 5
-tool_categories: [web-search, research]
-example_tools:
-  - web_search
-  - news_search
-  - image_search
-  - video_search
-use_cases:
-  - Finding current information on the web
-  - Privacy-focused research
-  - Gathering news and updates
-  - Image and video discovery
-hub_metadata:
+_hub_curation:
+  title: Brave Search MCP Server
+  category: search
+  tags:
+    - search
+    - web
+    - api
+    - research
+    - streamable-http
+  verified: true
   added_at: '2026-05-29'
   contributor: phibya
-  verified: true
+  min_ziee_version: null
+  summary: Web search via the Brave Search API for up-to-date information.
+
+$schema: https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json
+name: com.brave/search-mcp
+description: Web search via the Brave Search API for up-to-date information.
+version: 1.2.0
+repository:
+  url: https://github.com/brave/brave-search-mcp
+  source: github
+websiteUrl: https://brave.com/search/api/
+remotes:
+  - type: streamable-http
+    url: https://api.search.brave.com/mcp
+    headers:
+      - name: X-Subscription-Token
+        value: '{BRAVE_SUBSCRIPTION_TOKEN}'
+        description: Brave Search subscription token; interpolates BRAVE_SUBSCRIPTION_TOKEN at runtime.
+        isSecret: true
+        variables:
+          BRAVE_SUBSCRIPTION_TOKEN:
+            description: Brave Search subscription token (Data for AI tier or higher).
+            isRequired: true
+            isSecret: true
+            format: string

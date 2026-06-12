@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v2/assistant.schema.json",
+  "title": "Hub v2 Assistant Manifest",
+  "description": "Per-entry manifest for a HubAssistant. v2 keys the entry off the envelope's reverse-DNS `name` (and `version`). The body drops the v1 `recommended_models` / `recommended_mcp_servers` / `use_cases` / `example_prompts` / `popularity_score` fields and replaces the recommended_* pair with a typed `dependencies[]` list using reverse-DNS names and semver ranges.",
+  "allOf": [
+    { "$ref": "envelope.schema.json" }
+  ],
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "display_name",
+    "parameters"
+  ],
+  "properties": {
+    "display_name": { "type": "string" },
+    "description": { "type": ["string", "null"] },
+    "instructions": { "type": ["string", "null"] },
+    "parameters": {
+      "type": "object",
+      "description": "Free-form JSON config (temperature, max_tokens, etc.). Conventionally an empty {} for vanilla assistants.",
+      "additionalProperties": true
+    },
+    "category": { "type": ["string", "null"] },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "capabilities_required": {
+      "type": ["array", "null"],
+      "items": { "type": "string" }
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Informational cross-entry references (models + mcp-servers this assistant works best with). v2 does NOT auto-install dependencies; the FE surfaces them as 'Works best with' chips.",
+      "items": { "$ref": "dependency.schema.json" },
+      "default": []
+    },
+    "repository": {
+      "type": ["object", "null"],
+      "description": "Optional upstream source-of-truth for assistants that live in a separate repository (rare).",
+      "required": ["url", "source"],
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "source": { "type": "string" },
+        "id": { "type": "string" },
+        "subfolder": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "websiteUrl": {
+      "type": ["string", "null"],
+      "format": "uri"
+    },
+    "author": { "type": ["string", "null"] }
+  }
+}

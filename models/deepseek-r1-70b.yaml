@@ -1,11 +1,47 @@
-id: deepseek-r1-70b
-name: DeepSeek-R1 70B
+_hub_curation:
+  title: DeepSeek-R1 70B
+  category: model
+  tags:
+    - reasoning
+    - large
+    - instruct
+  verified: true
+  added_at: '2026-05-29'
+  contributor: phibya
+  min_ziee_version: '99.0.0'
+  summary: Large reasoning model. Flagged as requiring a future ziee-chat for its tensor-parallel runtime support.
+
+$schema: /schemas/v2/model.schema.json
+name: io.github.phibya/deepseek-r1-70b
+version: 1.0.0
 display_name: DeepSeek-R1 70B
 description: Large reasoning model. Flagged as requiring a future ziee-chat for its tensor-parallel runtime support — used to exercise the compat gate.
-repository_url: https://huggingface.co
-repository_path: deepseek-ai/DeepSeek-R1-Distill-Llama-70B
-main_filename: model.safetensors
-file_format: safetensors
+
+repository:
+  url: https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+  source: huggingface
+  id: deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+
+sources:
+  - registryType: huggingface
+    identifier: deepseek-ai/DeepSeek-R1-Distill-Llama-70B
+    version: main
+    fileFormat: safetensors
+    runtimeHint: mistralrs
+    contextLength: 65536
+    environmentVariables:
+      - name: HUGGINGFACE_API_KEY
+        description: Hugging Face access token with download access to this gated model.
+        isSecret: true
+        isRequired: true
+    quantizations:
+      - name: f16
+        mainFile: model.safetensors
+        sizeGb: 140.0
+        isDefault: true
+
+dependencies: []
+
 capabilities:
   chat: true
   tools: true
@@ -14,34 +50,18 @@ capabilities:
   text_embedding: false
   image_generator: false
   code_interpreter: true
-size_gb: 140.0
+
 tags:
   - reasoning
   - large
   - instruct
+
 recommended_parameters:
   temperature: 0.6
   top_p: 0.95
   top_k: 40
   repeat_penalty: 1.05
   context_size: 65536
-public: true
-popularity_score: 0.93
-license: MIT
-context_length: 65536
+
 language_support: [en, zh]
-recommended_engine: mistralrs
-recommended_engine_settings:
-  command: plain
-  device_type: auto
-  max_seqs: 4
-  max_sequence_len: 65536
-  chat_template: true
-  tokenizer_json: null
-  arch: llama
-auth_required: true
-hub_metadata:
-  added_at: '2026-05-29'
-  contributor: phibya
-  verified: true
-  min_ziee_version: '99.0.0'
+license: MIT

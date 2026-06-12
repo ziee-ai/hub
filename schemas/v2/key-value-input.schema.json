@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/v2/key-value-input.schema.json",
+  "title": "Hub v2 KeyValueInput",
+  "description": "Shared input shape for environment variables / headers / source-time secrets. Extracted from the official MCP server.json KeyValueInput definition (https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json#/definitions/KeyValueInput) so models can reuse the same wire shape for source-time credentials (e.g. HUGGINGFACE_API_KEY) as MCP packages do for runtime env.",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Variable name (e.g. 'HUGGINGFACE_API_KEY')."
+    },
+    "value": {
+      "type": "string",
+      "description": "Default value for the input. If not set, the user may be prompted to provide a value. If set, end users should NOT be able to override it. Identifiers wrapped in {curly_braces} are replaced by variables[]."
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description shown to the user in the credential prompt."
+    },
+    "isSecret": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if the value is a secret (token, password). Clients should handle the value securely (no logging, masked display)."
+    },
+    "isRequired": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if the consumer must collect a value before proceeding (e.g. download cannot proceed without an HF token for a gated repo)."
+    },
+    "format": {
+      "type": "string",
+      "description": "Input format hint. 'filepath' should be interpreted as a path on the user's filesystem.",
+      "enum": ["string", "number", "boolean", "filepath"],
+      "default": "string"
+    },
+    "default": {
+      "type": "string",
+      "description": "Default value for the input shown in the UI as a placeholder."
+    },
+    "choices": {
+      "type": "array",
+      "description": "List of allowed values. If provided, the user must pick one of these.",
+      "items": { "type": "string" }
+    },
+    "variables": {
+      "type": "object",
+      "description": "Map of variable names → nested input definitions. Keys in value wrapped in {curly_braces} are replaced with the corresponding variable's resolved value.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}
