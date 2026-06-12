@@ -1,41 +1,34 @@
-id: memory-mcp
-name: memory
-display_name: Memory & Context MCP Server
-description: Store and retrieve conversation context, notes, and knowledge for continuity across sessions.
-category: ai-tools
-tags:
-  - memory
-  - context
-  - notes
-  - knowledge
-transport_type: stdio
-command: npx
-args:
-  - '-y'
-  - '@modelcontextprotocol/server-memory'
-environment_variables: {}
-author: Anthropic
-homepage: https://github.com/modelcontextprotocol/servers
-repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/memory
-documentation_url: https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md
-version: 1.0.0
-license: MIT
-popularity_score: 93.0
-requires_desktop: true
-platform_support: [windows, macos, linux]
-tool_count: 6
-tool_categories: [knowledge-management, context-storage]
-example_tools:
-  - store_memory
-  - retrieve_memory
-  - search_memories
-  - delete_memory
-use_cases:
-  - Maintaining conversation context across sessions
-  - Storing important facts and preferences
-  - Building a knowledge base from interactions
-  - Remembering user preferences and history
-hub_metadata:
+_hub_curation:
+  title: Memory & Context MCP Server
+  category: ai-tools
+  tags:
+    - memory
+    - context
+    - notes
+    - knowledge
+    - stdio
+  verified: true
   added_at: '2026-05-29'
   contributor: phibya
-  verified: true
+  min_ziee_version: null
+  summary: Store and retrieve conversation context, notes, and knowledge across sessions.
+
+$schema: https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json
+name: io.github.modelcontextprotocol/memory
+description: Store and retrieve conversation context, notes, and knowledge across sessions.
+version: 1.0.0
+repository:
+  url: https://github.com/modelcontextprotocol/servers
+  source: github
+  subfolder: src/memory
+websiteUrl: https://modelcontextprotocol.io/
+packages:
+  - registryType: npm
+    identifier: '@modelcontextprotocol/server-memory'
+    version: 0.6.3
+    transport:
+      type: stdio
+    runtimeHint: npx
+    runtimeArguments:
+      - type: positional
+        value: '-y'

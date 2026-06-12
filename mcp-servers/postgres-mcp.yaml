@@ -1,48 +1,45 @@
-id: postgres-mcp
-name: postgres
-display_name: PostgreSQL MCP Server
-description: Connect to PostgreSQL databases and execute queries, manage schemas, and analyze data.
-category: database
-tags:
-  - database
-  - sql
-  - postgresql
-  - data
-transport_type: stdio
-command: npx
-args:
-  - '-y'
-  - '@modelcontextprotocol/server-postgres'
-environment_variables:
-  POSTGRES_CONNECTION_STRING: postgresql://user:password@localhost:5432/dbname
-required_env:
-  - name: POSTGRES_CONNECTION_STRING
-    description: PostgreSQL connection string in libpq format. Use a read-only role for safety.
-    placeholder: postgresql://user:password@localhost:5432/dbname
-    is_secret: true
-    docs_url: https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
-author: Anthropic
-homepage: https://github.com/modelcontextprotocol/servers
-repository_url: https://github.com/modelcontextprotocol/servers/tree/main/src/postgres
-documentation_url: https://github.com/modelcontextprotocol/servers/blob/main/src/postgres/README.md
-version: 1.0.0
-license: MIT
-popularity_score: 90.0
-requires_desktop: true
-platform_support: [windows, macos, linux]
-tool_count: 12
-tool_categories: [database-operations, query-execution, schema-management]
-example_tools:
-  - execute_query
-  - list_tables
-  - describe_table
-  - create_backup
-use_cases:
-  - Querying database information
-  - Analyzing data and generating reports
-  - Managing database schemas
-  - Data migration and backup operations
-hub_metadata:
+_hub_curation:
+  title: PostgreSQL MCP Server
+  category: database
+  tags:
+    - database
+    - sql
+    - postgresql
+    - data
+    - stdio
+  verified: true
   added_at: '2026-05-29'
   contributor: phibya
-  verified: true
+  min_ziee_version: null
+  summary: Connect to PostgreSQL databases, execute queries, manage schemas, and analyze data.
+
+$schema: https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json
+name: io.github.modelcontextprotocol/postgres
+description: Connect to PostgreSQL databases and execute queries, manage schemas, and analyze data.
+version: 1.0.0
+repository:
+  url: https://github.com/modelcontextprotocol/servers
+  source: github
+  subfolder: src/postgres
+websiteUrl: https://modelcontextprotocol.io/
+packages:
+  - registryType: npm
+    identifier: '@modelcontextprotocol/server-postgres'
+    version: 0.6.2
+    transport:
+      type: stdio
+    runtimeHint: npx
+    runtimeArguments:
+      - type: positional
+        value: '-y'
+    environmentVariables:
+      - name: POSTGRES_CONNECTION_STRING
+        value: '{POSTGRES_CONNECTION_STRING}'
+        description: PostgreSQL connection string in libpq format. Use a read-only role for safety.
+        isSecret: true
+        variables:
+          POSTGRES_CONNECTION_STRING:
+            description: PostgreSQL connection string in libpq format. Use a read-only role for safety.
+            isRequired: true
+            isSecret: true
+            format: string

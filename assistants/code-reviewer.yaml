@@ -1,37 +1,49 @@
-id: code-reviewer
-name: Code Reviewer
+_hub_curation:
+  title: Code Reviewer
+  category: development
+  tags:
+    - code
+    - security
+    - review
+    - best-practices
+  verified: true
+  added_at: '2026-05-29'
+  contributor: phibya
+  min_ziee_version: null
+  summary: Expert code reviewer with a security-and-best-practices focus.
+
+$schema: /schemas/2026-06-12/assistant.schema.json
+name: io.github.phibya/code-reviewer
+version: 1.0.0
 display_name: Code Reviewer
 description: Expert code reviewer with a security-and-best-practices focus.
+
 instructions: |
   You are an expert code reviewer. Focus on security, performance, maintainability,
   and best practices. Provide constructive feedback with specific, actionable suggestions.
   When you flag an issue, cite the file path and line number, explain the failure mode,
   and propose a concrete fix.
+
 parameters:
   temperature: 0.3
   max_tokens: 2048
+
 category: development
 tags:
   - code
   - security
   - review
   - best-practices
-recommended_models:
-  - llama-3-1-8b-instruct
-  - phi-3-mini-4k-instruct
+
 capabilities_required:
   - tools
-popularity_score: 0.88
+
+dependencies:
+  - kind: model
+    name: io.github.phibya/llama-3-1-8b-instruct
+    versionRange: "*"
+  - kind: model
+    name: io.github.phibya/phi-3-mini-4k-instruct
+    versionRange: "*"
+
 author: Ziee Team
-use_cases:
-  - Pull request reviews
-  - Security audits
-  - Code quality checks
-example_prompts:
-  - Review this Python function for security issues.
-  - Check this React component for performance problems.
-  - Suggest improvements for this API design.
-hub_metadata:
-  added_at: '2026-05-29'
-  contributor: phibya
-  verified: true

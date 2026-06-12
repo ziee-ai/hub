@@ -1,11 +1,60 @@
-id: nomic-embed-text-v1-5-gguf
-name: Nomic Embed Text v1.5 GGUF
+_hub_curation:
+  title: Nomic Embed Text v1.5
+  category: model
+  tags:
+    - embedding
+    - english
+    - retrieval
+    - rag
+    - text-similarity
+    - gguf
+    - memory-recommended
+  verified: true
+  added_at: '2026-05-29'
+  contributor: phibya
+  min_ziee_version: null
+  summary: High-quality general-purpose English embedding model (768-dim) packaged as GGUF for llama.cpp.
+
+$schema: /schemas/2026-06-12/model.schema.json
+name: io.github.phibya/nomic-embed-text-v1-5-gguf
+version: 1.0.0
 display_name: Nomic Embed Text v1.5
 description: High-quality general-purpose English embedding model (768-dim) packaged as GGUF for llama.cpp. Recommended default for the Memory module.
-repository_url: https://huggingface.co
-repository_path: nomic-ai/nomic-embed-text-v1.5-GGUF
-main_filename: nomic-embed-text-v1.5.Q4_K_M.gguf
-file_format: gguf
+
+repository:
+  url: https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF
+  source: huggingface
+  id: nomic-ai/nomic-embed-text-v1.5-GGUF
+
+sources:
+  - registryType: huggingface
+    identifier: nomic-ai/nomic-embed-text-v1.5-GGUF
+    version: main
+    fileFormat: gguf
+    runtimeHint: llamacpp
+    contextLength: 8192
+    environmentVariables:
+      - name: HUGGINGFACE_API_KEY
+        description: Hugging Face access token with download access to this gated model.
+        isSecret: true
+        isRequired: true
+    quantizations:
+      - name: q4_k_m
+        mainFile: nomic-embed-text-v1.5.Q4_K_M.gguf
+        sizeGb: 0.08
+        isDefault: true
+      - name: q5_k_m
+        mainFile: nomic-embed-text-v1.5.Q5_K_M.gguf
+        isDefault: false
+      - name: q8_0
+        mainFile: nomic-embed-text-v1.5.Q8_0.gguf
+        isDefault: false
+      - name: fp16
+        mainFile: nomic-embed-text-v1.5.F16.gguf
+        isDefault: false
+
+dependencies: []
+
 capabilities:
   chat: false
   tools: false
@@ -14,7 +63,7 @@ capabilities:
   text_embedding: true
   image_generator: false
   code_interpreter: false
-size_gb: 0.08
+
 tags:
   - embedding
   - english
@@ -23,30 +72,13 @@ tags:
   - text-similarity
   - gguf
   - memory-recommended
+
 recommended_parameters:
   temperature: null
   top_p: null
   top_k: null
   repeat_penalty: null
   context_size: 8192
-public: true
-popularity_score: 0.88
-license: Apache-2.0
-quantization_options:
-  - { name: q4_k_m, main_filename: nomic-embed-text-v1.5.Q4_K_M.gguf }
-  - { name: q5_k_m, main_filename: nomic-embed-text-v1.5.Q5_K_M.gguf }
-  - { name: q8_0,   main_filename: nomic-embed-text-v1.5.Q8_0.gguf }
-  - { name: fp16,   main_filename: nomic-embed-text-v1.5.F16.gguf }
-context_length: 8192
+
 language_support: [en]
-recommended_engine: llamacpp
-recommended_engine_settings:
-  embedding: true
-  pooling_type: mean
-  normalize_embeddings: true
-  dimension: 768
-auth_required: true
-hub_metadata:
-  added_at: '2026-05-29'
-  contributor: phibya
-  verified: true
+license: Apache-2.0

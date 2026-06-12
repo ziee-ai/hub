@@ -1,11 +1,48 @@
-id: phi-3-mini-4k-instruct
-name: Phi-3 Mini 4K Instruct
+_hub_curation:
+  title: Phi-3 Mini
+  category: model
+  tags:
+    - instruct
+    - chat
+    - small
+    - efficient
+  verified: true
+  added_at: '2026-05-29'
+  contributor: phibya
+  min_ziee_version: null
+  summary: Microsoft's small but capable instruction-tuned model. Great for low-resource setups.
+
+$schema: /schemas/2026-06-12/model.schema.json
+name: io.github.phibya/phi-3-mini-4k-instruct
+version: 1.0.0
 display_name: Phi-3 Mini
 description: Microsoft's small but capable instruction-tuned model. Great for low-resource setups.
-repository_url: https://huggingface.co
-repository_path: microsoft/Phi-3-mini-4k-instruct
-main_filename: model.safetensors
-file_format: safetensors
+
+repository:
+  url: https://huggingface.co/microsoft/Phi-3-mini-4k-instruct
+  source: huggingface
+  id: microsoft/Phi-3-mini-4k-instruct
+
+sources:
+  - registryType: huggingface
+    identifier: microsoft/Phi-3-mini-4k-instruct
+    version: main
+    fileFormat: safetensors
+    runtimeHint: mistralrs
+    contextLength: 4096
+    environmentVariables:
+      - name: HUGGINGFACE_API_KEY
+        description: Hugging Face access token with download access to this gated model.
+        isSecret: true
+        isRequired: true
+    quantizations:
+      - name: f16
+        mainFile: model.safetensors
+        sizeGb: 7.6
+        isDefault: true
+
+dependencies: []
+
 capabilities:
   chat: true
   tools: true
@@ -14,34 +51,19 @@ capabilities:
   text_embedding: false
   image_generator: false
   code_interpreter: true
-size_gb: 7.6
+
 tags:
   - instruct
   - chat
   - small
   - efficient
+
 recommended_parameters:
   temperature: 0.6
   top_p: 0.95
   top_k: 50
   repeat_penalty: 1.05
   context_size: 4096
-public: true
-popularity_score: 0.87
-license: MIT
-context_length: 4096
+
 language_support: [en]
-recommended_engine: mistralrs
-recommended_engine_settings:
-  command: plain
-  device_type: auto
-  max_seqs: 8
-  max_sequence_len: 4096
-  chat_template: true
-  tokenizer_json: null
-  arch: phi
-auth_required: true
-hub_metadata:
-  added_at: '2026-05-29'
-  contributor: phibya
-  verified: true
+license: MIT

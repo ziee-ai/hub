@@ -1,5 +1,7 @@
 /.cache/
 /dist/
+/.act-artifacts/
+/.act-run.log
 node_modules/
 *.swp
 .DS_Store

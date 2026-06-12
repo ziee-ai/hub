@@ -1,11 +1,48 @@
-id: llama-3-1-8b-instruct
-name: Llama 3.1 8B Instruct
+_hub_curation:
+  title: Llama 3.1 8B
+  category: model
+  tags:
+    - instruct
+    - chat
+    - code
+    - reasoning
+  verified: true
+  added_at: '2026-05-29'
+  contributor: phibya
+  min_ziee_version: null
+  summary: Meta's Llama 3.1 8B instruction-tuned model with improved capabilities.
+
+$schema: /schemas/2026-06-12/model.schema.json
+name: io.github.phibya/llama-3-1-8b-instruct
+version: 1.0.0
 display_name: Llama 3.1 8B
 description: Meta's Llama 3.1 8B instruction-tuned model with improved capabilities.
-repository_url: https://huggingface.co
-repository_path: meta-llama/Llama-3.1-8B-Instruct
-main_filename: model.safetensors
-file_format: safetensors
+
+repository:
+  url: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+  source: huggingface
+  id: meta-llama/Llama-3.1-8B-Instruct
+
+sources:
+  - registryType: huggingface
+    identifier: meta-llama/Llama-3.1-8B-Instruct
+    version: main
+    fileFormat: safetensors
+    runtimeHint: mistralrs
+    contextLength: 8192
+    environmentVariables:
+      - name: HUGGINGFACE_API_KEY
+        description: Hugging Face access token with download access to this gated model.
+        isSecret: true
+        isRequired: true
+    quantizations:
+      - name: f16
+        mainFile: model.safetensors
+        sizeGb: 16.1
+        isDefault: true
+
+dependencies: []
+
 capabilities:
   chat: true
   tools: true
@@ -14,34 +51,19 @@ capabilities:
   text_embedding: false
   image_generator: false
   code_interpreter: true
-size_gb: 16.1
+
 tags:
   - instruct
   - chat
   - code
   - reasoning
+
 recommended_parameters:
   temperature: 0.7
   top_p: 0.9
   top_k: 40
   repeat_penalty: 1.1
   context_size: 8192
-public: false
-popularity_score: 0.97
-license: Meta Custom License
-context_length: 8192
+
 language_support: [en, es, fr, de, it, pt, nl, pl]
-recommended_engine: mistralrs
-recommended_engine_settings:
-  command: plain
-  device_type: auto
-  max_seqs: 16
-  max_sequence_len: 8192
-  chat_template: true
-  tokenizer_json: null
-  arch: llama
-auth_required: true
-hub_metadata:
-  added_at: '2026-05-29'
-  contributor: phibya
-  verified: true
+license: Meta Custom License
