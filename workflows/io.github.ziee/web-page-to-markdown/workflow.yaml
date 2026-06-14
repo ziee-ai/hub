@@ -1,0 +1,50 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+sandbox: { flavor: full }
+
+inputs:
+  - name: url
+    required: true
+
+steps:
+  - id: fetch
+    kind: sandbox
+    run: |
+      curl -sL -A "ziee-bot/1.0" "{{ inputs.url }}" 2>/dev/null
+
+  - id: extract_readable
+    kind: sandbox
+    run: |
+      pip install --user readability-lxml html2text >/dev/null 2>&1
+      python3 - <<'EOF'
+      import sys
+      from readability import Document
+      import html2text
+      html = sys.stdin.read()
+      doc = Document(html)
+      h = html2text.HTML2Text()
+      h.body_width = 0
+      print("# " + doc.title())
+      print()
+      print(h.handle(doc.summary()))
+      EOF
+    stdin: "{{ fetch.output }}"
+    depends_on: [fetch]
+
+  - id: polish
+    kind: llm
+    prompt: |
+      Clean up this markdown -- fix formatting issues, remove navigation cruft, preserve content:
+      {{ extract_readable.output }}
+      Return clean markdown.
+    depends_on: [extract_readable]
+
+outputs:
+  - name: markdown
+    from: "{{ polish.output }}"
+    expose: full
+  - name: raw_html
+    from: "{{ fetch.output }}"
+    expose: artifact
+    description: "Original HTML of the fetched page (for debugging extraction issues)"
+    mime_type: text/html

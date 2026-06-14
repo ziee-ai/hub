@@ -1,0 +1,122 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+# No sandbox steps -- pure LLM orchestration.
+expose_logs: on_error
+
+inputs:
+  - name: topic
+    description: "What to research"
+    required: true
+  - name: depth
+    description: "shallow | deep -- deep does cross-verification + breadth expansion"
+    required: false
+    default: "deep"
+  - name: target_word_count
+    description: "Approximate length of the final memo"
+    required: false
+    default: "1500"
+
+steps:
+  - id: generate_queries
+    kind: llm
+    message: "Generating search angles for {{ inputs.topic }}"
+    prompt: |
+      Generate 8 distinct search queries to investigate "{{ inputs.topic }}".
+      Cover: fundamentals, recent developments, criticisms / counterpoints,
+      practical applications, key figures + organizations.
+      Return JSON array of strings (no prose).
+    output_format: json
+
+  - id: fetch_sources
+    kind: llm_map
+    message: "Searching {{ inputs.topic }} -- {{ extract.completed }}/8 queries"
+    for_each: "{{ generate_queries.output }}"
+    item_var: query
+    prompt: |
+      You are a research assistant. For the query "{{ query }}", produce
+      a JSON array of 3-5 high-quality sources with this shape:
+      [{"title": "...", "url": "...", "summary": "2-3 sentences"}]
+      Prefer primary sources, recent (last 3 years), authoritative outlets.
+      Avoid duplicate URLs across queries.
+    output_format: json
+    max_parallel: 4
+    on_error: skip
+    depends_on: [generate_queries]
+
+  - id: extract_claims
+    kind: llm_map
+    message: "Extracting claims from sources"
+    for_each: "{{ fetch_sources.output }}"
+    item_var: source_set
+    prompt: |
+      Given these sources:
+      {{ source_set | json }}
+      Extract 3-5 distinct factual claims, each with:
+      [{"claim": "...", "supporting_source_url": "...", "confidence": "high|medium|low"}]
+      Return only JSON.
+    output_format: json
+    max_parallel: 4
+    on_error: skip
+    depends_on: [fetch_sources]
+
+  - id: cross_verify
+    kind: llm
+    message: "Cross-verifying claims for consistency"
+    prompt: |
+      Below are extracted research claims:
+      {{ extract_claims.output | json }}
+
+      Cross-verify: which claims are supported by multiple sources?
+      Which contradict each other? Which are uncorroborated?
+      Return JSON: {
+        "corroborated": [{"claim": "...", "support_count": N, "urls": [...]}],
+        "contradicted": [{"claim_a": "...", "claim_b": "...", "urls_a": [...], "urls_b": [...]}],
+        "single_source": [{"claim": "...", "url": "..."}]
+      }
+    output_format: json
+    depends_on: [extract_claims]
+
+  - id: outline
+    kind: llm
+    message: "Drafting outline"
+    prompt: |
+      For a {{ inputs.target_word_count }}-word memo on "{{ inputs.topic }}",
+      produce a markdown-formatted outline. Anchor sections to the
+      cross-verified claims:
+      {{ cross_verify.output | json }}
+      Outline should have: intro, 3-5 thematic sections, conclusion.
+    depends_on: [cross_verify]
+
+  - id: write_memo
+    kind: llm
+    message: "Writing final memo"
+    prompt: |
+      Write a {{ inputs.target_word_count }}-word memo on "{{ inputs.topic }}"
+      following this outline:
+      {{ outline.output }}
+
+      Use the verified claims:
+      {{ cross_verify.output | json }}
+
+      Cite sources inline as [source-title](url). Include a "Sources" section
+      at the end listing all unique URLs.
+
+      Return clean markdown.
+    depends_on: [outline]
+
+outputs:
+  - name: memo
+    from: "{{ write_memo.output }}"
+    expose: full
+
+  - name: research_artifact
+    from: "{{ extract_claims.output }}"
+    expose: artifact
+    description: "Full claim extraction across all sources (JSON). Use to cite specific data points or dive deeper into a single source's findings."
+    mime_type: application/json
+
+  - name: outline_artifact
+    from: "{{ outline.output }}"
+    expose: artifact
+    description: "The structural outline used to write the memo. Reference for tracking what was covered."
+    mime_type: text/markdown

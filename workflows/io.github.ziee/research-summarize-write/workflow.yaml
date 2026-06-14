@@ -1,0 +1,46 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+expose_logs: on_error
+
+inputs:
+  - name: topic
+    description: "What to research and summarize"
+    required: true
+
+steps:
+  - id: research
+    kind: llm
+    message: "Researching {{ inputs.topic }}"
+    prompt: |
+      Produce 5-8 high-quality sources on "{{ inputs.topic }}".
+      Return JSON array of {title, url, summary} objects.
+      Prefer primary sources and recent (last 3 years) outlets.
+    output_format: json
+
+  - id: summarize
+    kind: llm
+    message: "Summarizing sources"
+    prompt: |
+      Summarize these sources into a coherent set of key claims:
+      {{ research.output | json }}
+
+      Return JSON array of {claim, supporting_source_url, confidence} objects.
+    output_format: json
+    depends_on: [research]
+
+  - id: write
+    kind: llm
+    message: "Writing final memo"
+    prompt: |
+      Write a clear, well-cited memo on "{{ inputs.topic }}" using these
+      verified claims:
+      {{ summarize.output | json }}
+
+      Cite sources inline as [title](url). End with a "Sources" section
+      listing all unique URLs.
+    depends_on: [summarize]
+
+outputs:
+  - name: memo
+    from: "{{ write.output }}"
+    expose: full

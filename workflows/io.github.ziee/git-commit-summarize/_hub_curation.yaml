@@ -1,0 +1,8 @@
+title: "Git Commit Summarize"
+category: workflow
+tags: [git, commit, sandbox, conventional-commits]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "Capture git diff + status, draft a conventional-commits message."

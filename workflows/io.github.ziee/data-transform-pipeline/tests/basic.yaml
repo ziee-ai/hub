@@ -1,0 +1,15 @@
+mode: ci
+inputs:
+  input_data: '[{"a":1,"b":2},{"a":3,"b":4}]'
+  transform_description: "sum column b grouped by column a"
+mocks:
+  detect_shape: { "format": "json", "columns": ["a", "b"], "row_count_estimate": 2, "sample_row": "{\"a\":1,\"b\":2}" }
+  write_transform_script: "import sys, json\ndata = json.load(sys.stdin)\nresult = {}\nfor r in data:\n    result[r['a']] = result.get(r['a'], 0) + r['b']\nprint(json.dumps(result))\n"
+  validate_output: { "success": true, "issues": [] }
+expected_outputs:
+  validation:
+    contains: "success"
+    min_length: 1
+  transform_script:
+    contains: "import"
+    min_length: 10

@@ -1,0 +1,8 @@
+title: "Web Page to Markdown"
+category: workflow
+tags: [web, scraping, markdown, sandbox, readability]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "Fetch a URL, extract readable content, polish to clean markdown."

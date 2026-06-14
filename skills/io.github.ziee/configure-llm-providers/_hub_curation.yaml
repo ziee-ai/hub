@@ -1,0 +1,8 @@
+title: "Configure LLM Providers"
+category: knowledge
+tags: [providers, setup, anthropic, openai, ollama, groq]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: CC0-1.0
+summary: "Walks the user through adding/configuring LLM providers in ziee."

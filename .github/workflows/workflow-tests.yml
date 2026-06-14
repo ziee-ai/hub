@@ -1,0 +1,58 @@
+name: workflow-tests
+
+# Structural validation for skill + workflow source dirs. Pure Python — no
+# ziee binary, no Postgres, no bwrap. Behavioral validation is the
+# consumer-side responsibility (ziee-chat's hub-workflows-smoke).
+#
+# Triggers on any change to workflows/, skills/, schemas/, or the validator.
+
+on:
+  pull_request:
+    paths:
+      - 'workflows/**'
+      - 'skills/**'
+      - 'schemas/**'
+      - 'scripts/validate.py'
+      - 'scripts/build-pages.py'
+      - 'scripts/check-reproducibility.py'
+      - 'scripts/check-validator-fixtures.py'
+      - '.github/workflows/workflow-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'workflows/**'
+      - 'skills/**'
+      - 'schemas/**'
+      - 'scripts/validate.py'
+      - 'scripts/build-pages.py'
+  workflow_dispatch:
+
+concurrency:
+  group: workflow-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate-structure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: install deps
+        run: pip install --quiet 'pyyaml>=6' 'jsonschema>=4.21' 'referencing>=0.35'
+
+      - name: validate (schema + tests-required + mock-coverage)
+        run: python3 scripts/validate.py
+
+      - name: reproducibility (rebuild + diff sha256)
+        run: python3 scripts/check-reproducibility.py
+
+      - name: validator fixture parity
+        run: python3 scripts/check-validator-fixtures.py

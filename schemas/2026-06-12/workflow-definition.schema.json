@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/workflow-definition.schema.json",
+  "title": "Workflow Definition (workflow.yaml inside the bundle)",
+  "description": "The actual workflow DAG definition. Lives at <extracted_path>/workflow.yaml. Validated by both the publisher's validate.py AND the consumer's workflow::validate module against this exact schema. Layer 1 of cross-repo validation parity (§4.1).",
+  "type": "object",
+  "required": ["steps"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "sandbox": {
+      "type": "object",
+      "description": "Required when any step has kind: sandbox. Picks the code_sandbox rootfs flavor for ALL sandbox steps in this workflow.",
+      "required": ["flavor"],
+      "properties": {
+        "flavor": {
+          "type": "string",
+          "enum": ["minimal", "full"],
+          "description": "minimal (~150 MB: bash + coreutils + curl). full (~850 MB: minimal + python3 + pip + node + npm)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "expose_logs": {
+      "type": "string",
+      "enum": ["always", "on_error", "never"],
+      "default": "on_error",
+      "description": "Workflow-level default for log resource exposure. Per-step override available via step.expose_logs."
+    },
+    "inputs": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$" },
+          "description": { "type": ["string", "null"] },
+          "required": { "type": "boolean", "default": false },
+          "default": {}
+        },
+        "additionalProperties": false
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": { "$ref": "#/$defs/Step" }
+    },
+    "outputs": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["name", "from"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$" },
+          "from": {
+            "type": "string",
+            "description": "Template referencing a step output, e.g. '{{ step_id.output }}'."
+          },
+          "expose": {
+            "type": "string",
+            "enum": ["full", "preview", "artifact", "path", "hidden"],
+            "default": "full"
+          },
+          "description": {
+            "type": ["string", "null"],
+            "maxLength": 1024,
+            "description": "Author-written explanation the LLM sees in the resource block when expose: artifact."
+          },
+          "mime_type": { "type": ["string", "null"] }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Step": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Step identifier — unique within workflow. Lowercase + underscore."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["llm", "llm_map", "sandbox", "elicit"],
+          "default": "llm"
+        },
+        "depends_on": {
+          "type": "array",
+          "default": [],
+          "items": { "type": "string" }
+        },
+        "message": {
+          "type": ["string", "null"],
+          "description": "Author-defined UI status string. Template-rendered at step start."
+        },
+        "log": {
+          "type": "string",
+          "enum": ["off", "stderr", "full"],
+          "default": "off"
+        },
+        "expose_logs": {
+          "type": ["string", "null"],
+          "enum": ["always", "on_error", "never", null],
+          "description": "Per-step override of workflow-level expose_logs."
+        },
+        "mock": {
+          "description": "Dev-only canned response. Publisher REJECTS this field in published bundles."
+        },
+        "artifacts": {
+          "type": ["array", "null"],
+          "description": "Files this step produces in artifacts/<step_id>/. Each entry has either path (exact) or glob.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": { "type": "string" },
+              "glob": { "type": "string" },
+              "description": { "type": ["string", "null"], "maxLength": 1024 },
+              "mime_type": { "type": ["string", "null"] }
+            },
+            "oneOf": [
+              { "required": ["path"] },
+              { "required": ["glob"] }
+            ]
+          }
+        },
+        "prompt": { "type": ["string", "null"] },
+        "prompt_file": { "type": ["string", "null"] },
+        "output_format": { "type": "string", "enum": ["text", "json"], "default": "text" },
+        "tools": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "for_each": { "type": ["string", "null"] },
+        "item_var": { "type": ["string", "null"] },
+        "max_parallel": { "type": "integer", "minimum": 1, "maximum": 20, "default": 5 },
+        "on_error": { "type": "string", "enum": ["fail", "skip", "retry"], "default": "fail" },
+        "max_retries": { "type": "integer", "minimum": 0, "maximum": 10, "default": 2 },
+        "run": { "type": ["string", "null"] },
+        "stdin": { "type": ["string", "null"] },
+        "timeout_ms": { "type": "integer", "minimum": 100, "maximum": 600000, "default": 30000 },
+        "schema": { "type": ["object", "null"] }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "llm" } } },
+          "then": {
+            "oneOf": [
+              { "required": ["prompt"], "not": { "required": ["prompt_file"] } },
+              { "required": ["prompt_file"], "not": { "required": ["prompt"] } }
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "llm_map" } } },
+          "then": {
+            "required": ["for_each", "item_var"],
+            "oneOf": [
+              { "required": ["prompt"], "not": { "required": ["prompt_file"] } },
+              { "required": ["prompt_file"], "not": { "required": ["prompt"] } }
+            ]
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "sandbox" } } },
+          "then": { "required": ["run"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "elicit" } } },
+          "then": { "required": ["message", "schema"] }
+        }
+      ]
+    }
+  }
+}

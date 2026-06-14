@@ -1,0 +1,8 @@
+title: "Answer With Citations"
+category: workflow
+tags: [question-answering, citations, elicit, llm-map]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "Confirm scope, fan-out search queries, synthesize a cited answer."

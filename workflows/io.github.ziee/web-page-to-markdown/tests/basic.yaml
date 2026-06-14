@@ -1,0 +1,9 @@
+mode: ci
+inputs:
+  url: "https://example.com/article"
+mocks:
+  polish: "# Example Article\n\nClean markdown body here.\n"
+expected_outputs:
+  markdown:
+    contains: "Example"
+    min_length: 10

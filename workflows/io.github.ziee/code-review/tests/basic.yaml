@@ -1,0 +1,13 @@
+mode: ci
+inputs:
+  target_dir: "/workspace/example"
+  ref_a: "main"
+mocks:
+  review_per_file:
+    - { "file": "src/main.rs", "findings": [{ "severity": "low", "category": "style", "description": "unused import", "line": 4 }] }
+    - { "file": "src/lib.rs", "findings": [] }
+  aggregate: "# Code Review\n\n## Summary\n\nLow-risk change, mostly style nits.\n\n## Critical issues\n\n_None._\n\n## Recommendations\n\n- Drop unused import in main.rs\n\n## Files reviewed\n\n2 files reviewed: src/main.rs, src/lib.rs\n"
+expected_outputs:
+  review_summary:
+    contains: "Code Review"
+    min_length: 30

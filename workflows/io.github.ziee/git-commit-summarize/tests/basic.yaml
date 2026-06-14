@@ -1,0 +1,9 @@
+mode: ci
+inputs:
+  repo_dir: "/workspace/example"
+mocks:
+  summarize: "feat: add deep-research workflow seed\n\nIntroduces the multi-stage research pipeline as a built-in workflow.\n"
+expected_outputs:
+  commit_message:
+    contains: "feat"
+    min_length: 10

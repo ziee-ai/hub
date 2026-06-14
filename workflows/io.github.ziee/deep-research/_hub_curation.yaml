@@ -1,0 +1,8 @@
+title: "Deep Research"
+category: workflow
+tags: [research, fan-out, llm-map, headliner, memo]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "Multi-stage research pipeline -- query gen, fan-out search, cross-verify, outline, memo."

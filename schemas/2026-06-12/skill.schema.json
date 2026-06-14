@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/skill.schema.json",
+  "title": "Hub Skill Manifest",
+  "description": "Per-entry manifest for a HubSkill — points at a tar.gz bundle containing SKILL.md (Agent Skills standard) + references/ + optional scripts/. SKILL.md frontmatter parsed at consumer-install time.",
+  "allOf": [
+    { "$ref": "envelope.schema.json" }
+  ],
+  "type": "object",
+  "required": ["name", "version", "bundle"],
+  "properties": {
+    "description": {
+      "type": ["string", "null"],
+      "description": "Human-readable summary mirrored from SKILL.md frontmatter description for index display. The authoritative content lives in the bundle's SKILL.md."
+    },
+    "bundle": { "$ref": "bundle.schema.json" },
+    "dependencies": {
+      "type": "array",
+      "description": "Informational cross-entry references (other skills / mcp-servers this skill works best with).",
+      "items": { "$ref": "dependency.schema.json" },
+      "default": []
+    },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "license": {
+      "type": ["string", "null"],
+      "description": "SPDX license identifier. Required for hub publish (publisher validator rejects missing/non-permissive)."
+    },
+    "author": { "type": ["string", "null"] }
+  }
+}

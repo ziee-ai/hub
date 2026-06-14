@@ -1,0 +1,25 @@
+mode: ci
+inputs:
+  topic: "transformer architecture in 2024"
+mocks:
+  generate_queries: ["query1", "query2", "query3"]
+  fetch_sources:
+    - [{ "title": "T1", "url": "u1", "summary": "s1" }]
+    - [{ "title": "T2", "url": "u2", "summary": "s2" }]
+    - [{ "title": "T3", "url": "u3", "summary": "s3" }]
+  extract_claims:
+    - [{ "claim": "c1", "supporting_source_url": "u1", "confidence": "high" }]
+    - [{ "claim": "c2", "supporting_source_url": "u2", "confidence": "medium" }]
+    - [{ "claim": "c3", "supporting_source_url": "u3", "confidence": "high" }]
+  cross_verify:
+    corroborated: [{ "claim": "c1", "support_count": 1, "urls": ["u1"] }]
+    contradicted: []
+    single_source: [{ "claim": "c2", "url": "u2" }]
+  outline: "# Outline\n## Section 1\n## Section 2\n## Conclusion"
+  write_memo: "# Memo on transformer architecture\n\n[T1](u1) is foundational...\n\n## Sources\n- [T1](u1)"
+expected_outputs:
+  memo:
+    contains: "transformer"
+    min_length: 50
+  research_artifact:
+    matches_schema: { type: array, minItems: 1 }

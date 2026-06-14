@@ -1,0 +1,8 @@
+title: "Extract and Classify"
+category: workflow
+tags: [extraction, classification, llm-map, text-processing]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "Chunk text, extract per chunk in parallel, classify aggregated extractions."

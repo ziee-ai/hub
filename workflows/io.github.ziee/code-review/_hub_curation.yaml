@@ -1,0 +1,8 @@
+title: "Code Review"
+category: workflow
+tags: [code-review, git, sandbox, llm-map]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "Walks git diff, reviews each file via LLM, synthesizes findings."

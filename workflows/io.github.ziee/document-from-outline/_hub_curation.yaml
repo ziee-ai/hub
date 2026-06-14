@@ -1,0 +1,8 @@
+title: "Document From Outline"
+category: workflow
+tags: [writing, llm-map, document]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "Parse outline, fan-out write each section in parallel, assemble final doc."

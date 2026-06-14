@@ -1,0 +1,8 @@
+title: "Set Up Memory"
+category: knowledge
+tags: [memory, pgvector, persistence, mem0]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: CC0-1.0
+summary: "Enable + use ziee's per-user persistent memory."
