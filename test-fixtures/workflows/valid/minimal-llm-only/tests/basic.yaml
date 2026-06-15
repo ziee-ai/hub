@@ -1,0 +1,9 @@
+mode: ci
+inputs:
+  topic: "photosynthesis"
+mocks:
+  summarize: "Photosynthesis converts light into chemical energy."
+expected_outputs:
+  summary:
+    contains: "Photosynthesis"
+    min_length: 10

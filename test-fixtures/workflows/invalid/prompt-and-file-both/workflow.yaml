@@ -1,0 +1,7 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+steps:
+  - id: a
+    kind: llm
+    prompt: "inline prompt"
+    prompt_file: prompts/a.md

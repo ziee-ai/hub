@@ -139,7 +139,7 @@
         "max_parallel": { "type": "integer", "minimum": 1, "maximum": 20, "default": 5 },
         "on_error": { "type": "string", "enum": ["fail", "skip", "retry"], "default": "fail" },
         "max_retries": { "type": "integer", "minimum": 0, "maximum": 10, "default": 2 },
-        "run": { "type": ["string", "null"] },
+        "run": { "type": ["string", "null"], "minLength": 1 },
         "stdin": { "type": ["string", "null"] },
         "timeout_ms": { "type": "integer", "minimum": 100, "maximum": 600000, "default": 30000 },
         "schema": { "type": ["object", "null"] }

@@ -1,0 +1,28 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+sandbox:
+  flavor: minimal
+
+inputs:
+  - name: topic
+    description: "Topic to echo"
+    required: true
+
+steps:
+  - id: generate
+    kind: llm
+    prompt: |
+      Return a short JSON array of facts about "{{ inputs.topic }}".
+    output_format: json
+
+  - id: flatten
+    kind: sandbox
+    message: "Flattening claim list"
+    run: jq 'flatten' {{ generate.path }}
+    log: stderr
+    timeout_ms: 30000
+    depends_on: [generate]
+
+outputs:
+  - name: flattened
+    from: "{{ flatten.output }}"

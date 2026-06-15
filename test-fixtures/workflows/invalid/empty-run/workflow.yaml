@@ -1,0 +1,9 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+sandbox:
+  flavor: minimal
+
+steps:
+  - id: a
+    kind: sandbox
+    run: "   "

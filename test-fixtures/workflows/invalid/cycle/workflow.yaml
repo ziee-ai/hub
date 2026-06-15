@@ -1,0 +1,11 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+steps:
+  - id: a
+    kind: llm
+    prompt: "step a"
+    depends_on: [b]
+  - id: b
+    kind: llm
+    prompt: "step b"
+    depends_on: [a]

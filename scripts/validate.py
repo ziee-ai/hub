@@ -454,6 +454,16 @@ def validate_workflow_dir(
                 llm_step_ids.append(sid)
         if kind == "sandbox":
             sandbox_used = True
+            # Reject empty / whitespace-only run: — the JSON Schema only
+            # requires the key be present; an empty command is semantically
+            # invalid. Mirrors the Rust side's WORKFLOW_SANDBOX_NO_RUN.
+            run_val = step.get("run")
+            if not isinstance(run_val, str) or not run_val.strip():
+                errors.append(
+                    f"{rel_root}/workflow.yaml: step[{i}] ({sid}): "
+                    f"sandbox step has empty/whitespace run: "
+                    f"[WORKFLOW_SANDBOX_NO_RUN]"
+                )
         if "mock" in step:
             errors.append(
                 f"{rel_root}/workflow.yaml: step[{i}] ({sid}): "
@@ -514,6 +524,73 @@ def validate_workflow_dir(
                     queue.append(sid)
     if visited < len(deps):
         errors.append(f"{rel_root}/workflow.yaml: depends_on graph has a cycle")
+
+    # Template reference resolution (Layer 2 §4.1): every {{ X.Y }} root `X`
+    # must be either `inputs` (matching a declared workflow.inputs[].name),
+    # an earlier step id, or a step-local loop var (item_var on the owning
+    # llm_map step). The leaf check (Y valid for X's inferred type) is the
+    # consumer-authoritative type-inference pass (§4.1 a/b); here we only
+    # resolve the ROOT identifier so an undeclared reference is caught.
+    input_names = set()
+    for inp in (wf_def.get("inputs") or []):
+        if isinstance(inp, dict) and isinstance(inp.get("name"), str):
+            input_names.add(inp["name"])
+    # Roots that are always legal regardless of position.
+    static_roots = {"inputs"}
+    for step in steps:
+        if not isinstance(step, dict):
+            continue
+        sid = step.get("id")
+        item_var = step.get("item_var") if isinstance(step.get("item_var"), str) else None
+        # Templated DATA-FLOW string fields a step may carry. `message:` is
+        # deliberately excluded — it's a cosmetic UI status string that may
+        # reference live runtime progress counters (e.g. {{ step.completed }})
+        # that aren't statically-resolvable step outputs.
+        templ_fields = []
+        for fld in ("prompt", "run", "stdin", "for_each"):
+            val = step.get(fld)
+            if isinstance(val, str):
+                templ_fields.append(val)
+        for templ in templ_fields:
+            for m in TEMPLATE_REF_RE.finditer(templ):
+                root = m.group(1)
+                if root in static_roots:
+                    # {{ inputs.X }} — X must be a declared input.
+                    full = m.group(0)
+                    dm = re.match(r"\{\{\s*inputs\.([a-zA-Z_][a-zA-Z0-9_]*)", full)
+                    if dm and input_names and dm.group(1) not in input_names:
+                        errors.append(
+                            f"{rel_root}/workflow.yaml: step {sid!r} references "
+                            f"unknown input {dm.group(1)!r} "
+                            f"[WORKFLOW_UNKNOWN_VAR_REF]"
+                        )
+                    continue
+                if item_var and root == item_var:
+                    continue
+                if root in seen_ids:
+                    continue
+                errors.append(
+                    f"{rel_root}/workflow.yaml: step {sid!r} references "
+                    f"unknown variable {root!r} "
+                    f"[WORKFLOW_UNKNOWN_VAR_REF]"
+                )
+
+    # outputs[].from references resolve to a known step (or inputs).
+    for out in (wf_def.get("outputs") or []):
+        if not isinstance(out, dict):
+            continue
+        frm = out.get("from")
+        if not isinstance(frm, str):
+            continue
+        for m in TEMPLATE_REF_RE.finditer(frm):
+            root = m.group(1)
+            if root in static_roots or root in seen_ids:
+                continue
+            errors.append(
+                f"{rel_root}/workflow.yaml: output {out.get('name')!r} "
+                f"references unknown variable {root!r} "
+                f"[WORKFLOW_UNKNOWN_VAR_REF]"
+            )
 
     # sandbox.flavor required if any sandbox step
     sandbox_cfg = wf_def.get("sandbox") or {}

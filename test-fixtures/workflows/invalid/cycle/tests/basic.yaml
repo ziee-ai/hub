@@ -1,0 +1,6 @@
+mode: ci
+inputs: {}
+mocks:
+  a: "mock a"
+  b: "mock b"
+expected_outputs: {}

@@ -1,0 +1,17 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+inputs:
+  - name: topic
+    description: "Topic to summarize"
+    required: true
+
+steps:
+  - id: summarize
+    kind: llm
+    message: "Summarizing {{ inputs.topic }}"
+    prompt: |
+      Write one concise paragraph about "{{ inputs.topic }}".
+
+outputs:
+  - name: summary
+    from: "{{ summarize.output }}"
