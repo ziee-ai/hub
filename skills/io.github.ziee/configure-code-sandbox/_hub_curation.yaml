@@ -1,8 +1,0 @@
-title: "Configure Code Sandbox"
-category: knowledge
-tags: [sandbox, bwrap, code-execution, python, setup]
-verified: true
-added_at: '2026-06-14'
-contributor: ziee
-license: CC0-1.0
-summary: "Enable + configure ziee's bwrap-isolated code execution sandbox."
