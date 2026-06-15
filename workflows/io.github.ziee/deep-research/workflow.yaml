@@ -29,7 +29,7 @@ steps:
 
   - id: fetch_sources
     kind: llm_map
-    message: "Searching {{ inputs.topic }} -- {{ extract.completed }}/8 queries"
+    message: "Searching sources for {{ inputs.topic }}"
     for_each: "{{ generate_queries.output }}"
     item_var: query
     prompt: |

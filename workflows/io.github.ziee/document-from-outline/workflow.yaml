@@ -22,7 +22,7 @@ steps:
 
   - id: write_sections
     kind: llm_map
-    message: "Writing section: {{ section.heading }}"
+    message: "Writing sections for {{ inputs.title }}"
     for_each: "{{ parse_outline.output }}"
     item_var: section
     prompt: |
