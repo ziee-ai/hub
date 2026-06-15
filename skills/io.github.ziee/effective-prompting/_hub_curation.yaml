@@ -1,0 +1,8 @@
+title: "Effective Prompting"
+category: knowledge
+tags: [prompting, prompt-engineering, llm, output-format, hallucination]
+verified: true
+added_at: '2026-06-15'
+contributor: ziee
+license: CC0-1.0
+summary: "Model-agnostic techniques for clearer, more reliable LLM prompts — structure, output shaping, few-shot, and hallucination control."
