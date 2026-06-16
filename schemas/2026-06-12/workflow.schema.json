@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/workflow.schema.json",
+  "title": "Hub Workflow Manifest",
+  "description": "Per-entry manifest for a HubWorkflow — points at a tar.gz bundle containing workflow.yaml + optional prompts/ + optional scripts/ + optional tests/. workflow.yaml validated against workflow-definition.schema.json at install + at the test endpoint.",
+  "allOf": [
+    { "$ref": "envelope.schema.json" }
+  ],
+  "type": "object",
+  "required": ["name", "version", "bundle"],
+  "properties": {
+    "description": {
+      "type": ["string", "null"],
+      "description": "Human-readable summary for index display. The authoritative definition lives in the bundle's workflow.yaml."
+    },
+    "bundle": { "$ref": "bundle.schema.json" },
+    "dependencies": {
+      "type": "array",
+      "description": "Informational cross-entry references (models / mcp-servers this workflow expects).",
+      "items": { "$ref": "dependency.schema.json" },
+      "default": []
+    },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "license": {
+      "type": ["string", "null"],
+      "description": "SPDX license identifier. Required for hub publish."
+    },
+    "author": { "type": ["string", "null"] }
+  }
+}

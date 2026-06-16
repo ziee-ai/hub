@@ -1,0 +1,2 @@
+# prompt + prompt_file are mutually exclusive (JSON Schema oneOf).
+- "is not valid under any of the given schemas"

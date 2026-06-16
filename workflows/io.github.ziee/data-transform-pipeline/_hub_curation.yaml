@@ -1,0 +1,8 @@
+title: "Data Transform Pipeline"
+category: workflow
+tags: [data, transformation, pandas, sandbox, json, csv]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "LLM detects shape, writes a Python transform script, sandbox runs + validates."

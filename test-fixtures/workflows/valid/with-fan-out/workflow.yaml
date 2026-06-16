@@ -1,0 +1,29 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+inputs:
+  - name: topic
+    description: "Topic to research"
+    required: true
+
+steps:
+  - id: generate_queries
+    kind: llm
+    prompt: |
+      Generate 3 search queries for "{{ inputs.topic }}".
+      Return a JSON array of strings.
+    output_format: json
+
+  - id: extract_per_query
+    kind: llm_map
+    for_each: "{{ generate_queries.output }}"
+    item_var: query
+    prompt: |
+      Search '{{ query }}' and extract key claims as a JSON array.
+    output_format: json
+    max_parallel: 3
+    on_error: skip
+    depends_on: [generate_queries]
+
+outputs:
+  - name: claims
+    from: "{{ extract_per_query.output }}"

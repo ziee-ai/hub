@@ -1,0 +1,8 @@
+title: "Research, Summarize, Write"
+category: workflow
+tags: [research, writing, demo, entry-level]
+verified: true
+added_at: '2026-06-14'
+contributor: ziee
+license: MIT
+summary: "Three-step llm chain: research a topic, summarize sources, write a memo."

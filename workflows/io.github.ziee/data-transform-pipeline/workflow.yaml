@@ -1,0 +1,71 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+sandbox: { flavor: full }
+
+inputs:
+  - name: input_data
+    description: "JSON / CSV / TSV input as string"
+    required: true
+  - name: transform_description
+    description: "What transformation to apply, in natural language"
+    required: true
+
+steps:
+  - id: detect_shape
+    kind: llm
+    prompt: |
+      Inspect this data sample and describe its shape:
+      {{ inputs.input_data | json }} (truncated to first 2KB if larger)
+      Return JSON: {"format": "json|csv|tsv|other", "columns": [...], "row_count_estimate": N, "sample_row": "..."}
+    output_format: json
+
+  - id: write_transform_script
+    kind: llm
+    prompt: |
+      Write a Python script that:
+      - Reads {{ detect_shape.output.format }} from stdin
+      - Performs this transformation: {{ inputs.transform_description }}
+      - Writes the result to stdout
+
+      Use pandas if useful. Be defensive about edge cases.
+      Return only the Python code (no markdown fences, no prose).
+    depends_on: [detect_shape]
+
+  - id: apply_transform
+    kind: sandbox
+    run: |
+      pip install --user pandas >/dev/null 2>&1
+      cat > /tmp/transform.py <<'PYEOF'
+      {{ write_transform_script.output }}
+      PYEOF
+      python3 /tmp/transform.py
+    stdin: "{{ inputs.input_data }}"
+    timeout_ms: 60000
+    artifacts:
+      - path: result.txt
+        description: "Transformed output"
+    depends_on: [write_transform_script]
+
+  - id: validate_output
+    kind: llm
+    prompt: |
+      Was this transformation successful?
+      Input shape: {{ detect_shape.output | json }}
+      Requested transform: {{ inputs.transform_description }}
+      Output sample: {{ apply_transform.output | json }} (truncated to first 2KB)
+      Return JSON: {"success": boolean, "issues": ["..."] }
+    output_format: json
+    depends_on: [apply_transform]
+
+outputs:
+  - name: result
+    from: "{{ apply_transform.output }}"
+    expose: full
+  - name: validation
+    from: "{{ validate_output.output }}"
+    expose: full
+  - name: transform_script
+    from: "{{ write_transform_script.output }}"
+    expose: artifact
+    description: "The generated Python script (review before trusting the output)"
+    mime_type: text/x-python

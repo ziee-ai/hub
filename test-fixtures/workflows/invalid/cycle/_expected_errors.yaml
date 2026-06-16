@@ -1,0 +1,4 @@
+# Each entry is a substring that MUST appear in the validator's emitted
+# error output for this fixture. Codes are the literal strings validate.py
+# emits (captured by running validate.py, not guessed).
+- "depends_on graph has a cycle"

@@ -1,0 +1,14 @@
+mode: ci
+inputs:
+  question: "What is quantum entanglement?"
+mocks:
+  generate_queries: ["entanglement definition", "EPR paradox history", "bell inequality experiments"]
+  search:
+    - [{ "title": "T1", "url": "u1", "key_quote": "Quantum entanglement is..." }]
+    - [{ "title": "T2", "url": "u2", "key_quote": "EPR paradox..." }]
+    - [{ "title": "T3", "url": "u3", "key_quote": "Bell inequality..." }]
+  synthesize: "Quantum entanglement refers to [1]. The EPR paradox [2] motivated Bell's test [3].\n\n## Sources\n1. [T1](u1)\n2. [T2](u2)\n3. [T3](u3)\n"
+expected_outputs:
+  answer:
+    contains: "Sources"
+    min_length: 30

@@ -1,0 +1,14 @@
+mode: ci
+inputs:
+  topic: "tide pools"
+mocks:
+  generate_queries:
+    - "tide pool ecology"
+    - "intertidal zones"
+    - "marine invertebrates"
+  extract_per_query:
+    - [{claim: "Tide pools host diverse life", source_url: "https://example.com/a"}]
+expected_outputs:
+  claims:
+    matches_schema:
+      type: array

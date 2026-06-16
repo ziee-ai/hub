@@ -32,3 +32,25 @@ just write "compatible with all hub-aware ziee-chat versions".
 - [ ] For models: the `repository_path` resolves on the upstream registry
 - [ ] For assistants: every id in `recommended_models` / `recommended_mcp_servers` exists in this repo
 - [ ] `hub_metadata.added_at` is today's date, `contributor` is my GitHub handle, `verified: false`
+
+## For workflow/skill PRs — trust-but-verify
+
+Workflows + skills run executable behavior the hub validator can only
+check structurally. Authors MUST run `wf test ./path/to/entry/` against
+a local ziee instance and paste the output here. Reviewers spot-check by
+running the same command locally before approval.
+
+- [ ] Workflow: `wf test ./workflows/<contrib>/<name>/` output pasted below
+- [ ] Skill: tested by enabling the skill in a fresh chat + verifying the
+      "available skills" listing surfaces it and the body loads via
+      `load_skill` (one-line log paste below is fine)
+
+<details>
+<summary><code>wf test</code> output (paste here)</summary>
+
+```
+$ wf test ./workflows/<contrib>/<name>/
+(paste output)
+```
+
+</details>

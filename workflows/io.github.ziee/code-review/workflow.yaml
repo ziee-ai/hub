@@ -1,0 +1,81 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+sandbox: { flavor: minimal }
+expose_logs: on_error
+
+inputs:
+  - name: target_dir
+    description: "Path to the code dir to review (must be accessible in sandbox)"
+    required: true
+  - name: ref_a
+    description: "Git ref to diff against (e.g., 'main')"
+    required: false
+    default: "main"
+
+steps:
+  - id: collect_changed_files
+    kind: sandbox
+    message: "Collecting changed files vs {{ inputs.ref_a }}"
+    run: |
+      cd {{ inputs.target_dir }}
+      git diff --name-only {{ inputs.ref_a }}...HEAD | jq -R -s -c 'split("\n") | map(select(length > 0))'
+
+  - id: review_per_file
+    kind: llm_map
+    message: "Reviewing files (one LLM call per file)"
+    for_each: "{{ collect_changed_files.output }}"
+    item_var: filename
+    prompt: |
+      You are a senior code reviewer. Review this file change:
+      File: {{ filename }}
+
+      Diff:
+      Use `git diff {{ inputs.ref_a }}...HEAD -- {{ filename }}` (the runner will substitute this in the sandbox step below)
+
+      Identify:
+      - Correctness bugs
+      - Security issues
+      - Performance concerns
+      - Code style problems
+      - Missing tests
+
+      Return JSON: {"file": "...", "findings": [{"severity": "high|medium|low", "category": "...", "description": "...", "line": N}]}
+    output_format: json
+    max_parallel: 3
+    on_error: skip
+    depends_on: [collect_changed_files]
+
+  - id: aggregate
+    kind: llm
+    message: "Synthesizing review findings"
+    prompt: |
+      Aggregate these per-file code review findings into a single review:
+      {{ review_per_file.output | json }}
+
+      Produce a markdown review with:
+      - **Summary**: 2-3 sentences on overall quality + risk
+      - **Critical issues**: high-severity findings, grouped by file
+      - **Recommendations**: top 5 improvements
+      - **Files reviewed**: count + list
+
+      Return clean markdown.
+    depends_on: [review_per_file]
+
+  - id: write_artifact
+    kind: sandbox
+    message: "Saving review as artifact"
+    run: |
+      mkdir -p artifacts/write_artifact
+      cat > artifacts/write_artifact/review.md <<'EOF'
+      {{ aggregate.output }}
+      EOF
+    artifacts:
+      - path: review.md
+        description: "Full markdown code review report"
+        mime_type: text/markdown
+    depends_on: [aggregate]
+
+outputs:
+  - name: review_summary
+    from: "{{ aggregate.output }}"
+    expose: full

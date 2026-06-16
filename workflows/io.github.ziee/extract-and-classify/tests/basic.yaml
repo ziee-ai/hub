@@ -1,0 +1,22 @@
+mode: ci
+inputs:
+  text: "Alice is the CTO. Bob is an engineer. Carol leads design."
+  schema_description: "people mentioned with their roles"
+  categories: '["leadership", "engineering", "design"]'
+mocks:
+  chunk:
+    - "Alice is the CTO. Bob is an engineer. Carol leads design."
+  extract_per_chunk:
+    - [
+        { "name": "Alice", "role": "CTO" },
+        { "name": "Bob", "role": "engineer" },
+        { "name": "Carol", "role": "design lead" }
+      ]
+  classify:
+    - { "name": "Alice", "role": "CTO", "category": "leadership" }
+    - { "name": "Bob", "role": "engineer", "category": "engineering" }
+    - { "name": "Carol", "role": "design lead", "category": "design" }
+expected_outputs:
+  classified:
+    matches_schema: { type: array, minItems: 1 }
+    min_length: 1

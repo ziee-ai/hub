@@ -1,0 +1,39 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+sandbox: { flavor: minimal }
+
+inputs:
+  - name: repo_dir
+    required: true
+
+steps:
+  - id: capture_diff
+    kind: sandbox
+    run: |
+      cd {{ inputs.repo_dir }}
+      git diff HEAD
+
+  - id: capture_status
+    kind: sandbox
+    run: |
+      cd {{ inputs.repo_dir }}
+      git status --porcelain
+
+  - id: summarize
+    kind: llm
+    message: "Drafting commit message"
+    prompt: |
+      Working directory diff:
+      {{ capture_diff.output }}
+
+      File status:
+      {{ capture_status.output }}
+
+      Write a clear commit message (subject <=72 chars + body explaining
+      WHY not WHAT). Use conventional-commits prefix (feat:/fix:/chore:/docs:/refactor:).
+      Return just the message text, no preamble.
+    depends_on: [capture_diff, capture_status]
+
+outputs:
+  - name: commit_message
+    from: "{{ summarize.output }}"

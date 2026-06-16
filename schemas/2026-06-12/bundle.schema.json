@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/bundle.schema.json",
+  "title": "Hub Bundle Pointer",
+  "description": "Reusable bundle-pointer shape for skill + workflow manifests. References a tar.gz served alongside the manifest on GitHub Pages.",
+  "type": "object",
+  "required": ["url", "sha256", "size_bytes", "file_count", "entry_point"],
+  "properties": {
+    "url": {
+      "type": "string",
+      "description": "Bundle URL relative to the Pages base (e.g., 'skills/io.github.ziee/configure-llm-providers/1.0.0.tar.gz'). Consumer joins with DEFAULT_PAGES_BASE."
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Hex-encoded SHA-256 of the tar.gz bytes. Consumer verifies after download."
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Bundle size in bytes. Used for pre-download cap check (10 MiB max)."
+    },
+    "file_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of regular files inside the bundle (excludes directories). Cap: 256."
+    },
+    "entry_point": {
+      "type": "string",
+      "description": "Conventional entry path within the extracted bundle ('SKILL.md' for skills; 'workflow.yaml' for workflows)."
+    }
+  },
+  "additionalProperties": false
+}

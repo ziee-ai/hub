@@ -1,0 +1,53 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+inputs:
+  - name: text
+    required: true
+  - name: schema_description
+    description: "What to extract (e.g., 'people mentioned with their roles')"
+    required: true
+  - name: categories
+    description: "Classification categories as JSON array"
+    required: false
+    default: "[]"
+
+steps:
+  - id: chunk
+    kind: llm
+    prompt: |
+      Split this text into chunks of ~500 words at natural boundaries:
+      {{ inputs.text }}
+      Return JSON array of strings.
+    output_format: json
+
+  - id: extract_per_chunk
+    kind: llm_map
+    for_each: "{{ chunk.output }}"
+    item_var: text_chunk
+    prompt: |
+      Extract {{ inputs.schema_description }} from this text:
+      {{ text_chunk }}
+
+      Return JSON array. Empty array if nothing matches.
+    output_format: json
+    max_parallel: 4
+    on_error: skip
+    depends_on: [chunk]
+
+  - id: classify
+    kind: llm
+    prompt: |
+      Given these extractions:
+      {{ extract_per_chunk.output | json }}
+
+      Categories: {{ inputs.categories }}
+
+      Tag each extraction with the best-fit category (or "uncategorized" if none).
+      Return JSON: [{...extraction, "category": "..."}]
+    output_format: json
+    depends_on: [extract_per_chunk]
+
+outputs:
+  - name: classified
+    from: "{{ classify.output }}"
+    expose: full

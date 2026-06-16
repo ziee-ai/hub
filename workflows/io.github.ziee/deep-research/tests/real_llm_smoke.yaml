@@ -1,0 +1,11 @@
+mode: real_llm
+inputs:
+  topic: "quantum entanglement"
+  depth: "deep"
+  target_word_count: "800"
+expected_outputs:
+  memo:
+    contains: "entanglement"
+    min_length: 500
+    matches_schema:
+      type: string

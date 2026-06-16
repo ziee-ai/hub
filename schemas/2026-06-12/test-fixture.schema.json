@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ziee.ai/hub/schemas/2026-06-12/test-fixture.schema.json",
+  "title": "Workflow Test Fixture",
+  "description": "Shape of tests/<name>.yaml files bundled with workflows. Run by POST /api/workflows/{id}/test. Mode 'ci' (default) requires mocks for every llm/llm_map step; 'real_llm' opts into real-LLM calls; 'snapshot' uses record/replay against captured responses.",
+  "type": "object",
+  "required": ["inputs", "expected_outputs"],
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["ci", "real_llm", "snapshot"],
+      "default": "ci"
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Per-fixture input values, keyed by workflow input name.",
+      "additionalProperties": true
+    },
+    "mocks": {
+      "type": "object",
+      "description": "Per-step canned responses. Required to cover ALL llm/llm_map steps when mode: ci. Keyed by step id.",
+      "additionalProperties": true
+    },
+    "expected_outputs": {
+      "type": "object",
+      "description": "Per-output assertions, keyed by output name.",
+      "additionalProperties": { "$ref": "#/$defs/Assertion" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Assertion": {
+      "type": "object",
+      "description": "Assertion against a workflow output. Combine multiple modes per output; all must pass.",
+      "properties": {
+        "equals": {},
+        "contains": { "type": "string" },
+        "min_length": { "type": "integer", "minimum": 0 },
+        "max_length": { "type": "integer", "minimum": 0 },
+        "matches_schema": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

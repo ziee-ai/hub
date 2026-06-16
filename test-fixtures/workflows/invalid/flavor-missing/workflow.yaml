@@ -1,0 +1,6 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+steps:
+  - id: a
+    kind: sandbox
+    run: "echo hello"

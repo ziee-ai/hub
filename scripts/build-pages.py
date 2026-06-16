@@ -33,10 +33,14 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import gzip
+import hashlib
+import io
 import json
 import re
 import shutil
 import sys
+import tarfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -60,7 +64,20 @@ CATEGORIES = [
     ("mcp-server", "mcp-servers", "mcp-server.schema.json"),
 ]
 
+# Directory-shaped categories. Each entry is a source dir tree; bundle the
+# rest of the dir (minus _hub_curation.yaml + tests/ + LICENSE) as tar.gz.
+CATEGORIES_DIR = [
+    ("skill", "skills", "skill.schema.json", "SKILL.md"),
+    ("workflow", "workflows", "workflow.schema.json", "workflow.yaml"),
+]
+
 FOLDER_BY_CAT = {cat: folder for cat, folder, _ in CATEGORIES}
+FOLDER_BY_CAT.update({cat: folder for cat, folder, _, _ in CATEGORIES_DIR})
+
+# Bundle caps (mirror validate.py + consumer-side)
+MAX_BUNDLE_BYTES = 10 * 1024 * 1024
+MAX_BUNDLE_FILES = 256
+MAX_FILE_BYTES = 2 * 1024 * 1024
 
 MCP_REGISTRY_URL = "https://registry.modelcontextprotocol.io/v0/servers"
 ALLOWED_PKG_REGISTRIES = {"npm", "pypi"}
@@ -441,6 +458,231 @@ def copy_schemas(schemas_dir: Path, out_dir: Path) -> None:
 
 
 # ----------------------------------------------------------------------------
+# Directory-shaped categories (skill / workflow): bundle + manifest
+# ----------------------------------------------------------------------------
+
+# Files/dirs that never ship in the bundle (kept in source for dev/CI).
+_EXCLUDED_TOP = {"_hub_curation.yaml", "tests"}
+_LICENSE_NAMES = {"LICENSE", "LICENSE.md", "LICENSE.txt", "license"}
+
+
+def _is_path_safe(rel: Path) -> bool:
+    """Reject absolute paths or '..' components."""
+    if rel.is_absolute():
+        return False
+    return ".." not in rel.parts
+
+
+def _collect_bundle_files(entry_dir: Path) -> list[tuple[Path, Path]]:
+    """Walk entry_dir, returning sorted (abs_path, rel_path) pairs that
+    SHIP in the bundle. Strips _hub_curation.yaml, tests/, and LICENSE.
+    Rejects symlinks. Raises ValueError on safety violations."""
+    files: list[tuple[Path, Path]] = []
+    for abs_path in sorted(entry_dir.rglob("*")):
+        rel = abs_path.relative_to(entry_dir)
+        if not _is_path_safe(rel):
+            raise ValueError(f"{entry_dir.name}/{rel}: path safety violation")
+        if abs_path.is_symlink():
+            raise ValueError(f"{entry_dir.name}/{rel}: symlinks rejected")
+        # Skip top-level excluded entries
+        if rel.parts[0] in _EXCLUDED_TOP:
+            continue
+        if rel.parts[0] in _LICENSE_NAMES:
+            # Don't ship LICENSE in the bundle either — it's referenced via
+            # _hub_curation.license. Keeps the bundle minimal.
+            continue
+        if abs_path.is_dir():
+            continue
+        if not abs_path.is_file():
+            raise ValueError(f"{entry_dir.name}/{rel}: non-regular file rejected")
+        files.append((abs_path, rel))
+    return files
+
+
+def _build_bundle(
+    category: str,
+    entry_dir: Path,
+    files: list[tuple[Path, Path]],
+) -> tuple[bytes, str, int, int]:
+    """Build deterministic tar.gz from `files`. Returns
+    (bytes, sha256_hex, size_bytes, file_count).
+
+    Determinism rules:
+    - Sorted filenames (caller provides sorted list)
+    - mtime=0 on every entry + the gzip header
+    - owner = root:root (uid=0, gid=0)
+    - For workflows: preserve execute bits on files under scripts/
+      (per plan §1 + author guidance — sandbox steps may invoke them).
+    - For skills: drop execute bits in Phase 1 (skill scripts deferred).
+    """
+    # Use a BytesIO + manual gzip wrap so we control the gzip mtime field.
+    raw = io.BytesIO()
+    # tar.gz is gzip(tar). Build the tar payload first.
+    tar_buf = io.BytesIO()
+    with tarfile.open(fileobj=tar_buf, mode="w", format=tarfile.USTAR_FORMAT) as tar:
+        total = 0
+        for abs_path, rel in files:
+            data = abs_path.read_bytes()
+            if len(data) > MAX_FILE_BYTES:
+                raise ValueError(
+                    f"{entry_dir.name}/{rel}: file size {len(data)} > cap {MAX_FILE_BYTES}"
+                )
+            info = tarfile.TarInfo(name=str(rel).replace("\\", "/"))
+            info.size = len(data)
+            info.mtime = 0
+            info.uid = 0
+            info.gid = 0
+            info.uname = ""
+            info.gname = ""
+            info.type = tarfile.REGTYPE
+            # Mode policy: 0644 default; preserve exec for workflow scripts/
+            mode = 0o644
+            if category == "workflow" and rel.parts[:1] == ("scripts",):
+                # Preserve owner-execute if the source had it; ensure read for all.
+                src_mode = abs_path.stat().st_mode
+                if src_mode & 0o100:
+                    mode = 0o755
+            info.mode = mode
+            tar.addfile(info, io.BytesIO(data))
+            total += len(data)
+    tar_bytes = tar_buf.getvalue()
+    # Wrap in gzip with deterministic mtime=0
+    raw_buf = io.BytesIO()
+    with gzip.GzipFile(fileobj=raw_buf, mode="wb", mtime=0, compresslevel=9) as gz:
+        gz.write(tar_bytes)
+    bundle_bytes = raw_buf.getvalue()
+    if len(bundle_bytes) > MAX_BUNDLE_BYTES:
+        raise ValueError(
+            f"{entry_dir.name}: bundle bytes {len(bundle_bytes)} > cap {MAX_BUNDLE_BYTES}"
+        )
+    if len(files) > MAX_BUNDLE_FILES:
+        raise ValueError(
+            f"{entry_dir.name}: file count {len(files)} > cap {MAX_BUNDLE_FILES}"
+        )
+    sha = hashlib.sha256(bundle_bytes).hexdigest()
+    return bundle_bytes, sha, len(bundle_bytes), len(files)
+
+
+def load_ziee_native_dirs(
+    repo: Path,
+    schemas_dir: Path,
+) -> tuple[dict[str, list[dict]], list[str]]:
+    """For each directory-shaped category, walk source dirs and prepare
+    in-memory entries. Each entry carries `curation`, `entry_dir`, and
+    a derived `body` (manifest envelope to be augmented with the bundle
+    pointer in the emission pass).
+    """
+    by_category: dict[str, list[dict]] = {cat: [] for cat, _, _, _ in CATEGORIES_DIR}
+    errors: list[str] = []
+    for category, folder, _schema, _entry_point in CATEGORIES_DIR:
+        base = repo / folder
+        if not base.is_dir():
+            continue
+        names: set[str] = set()
+        for contributor_dir in sorted(p for p in base.iterdir() if p.is_dir()):
+            contributor = contributor_dir.name
+            for entry_dir in sorted(p for p in contributor_dir.iterdir() if p.is_dir()):
+                leaf = entry_dir.name
+                full_name = f"{contributor}/{leaf}"
+                rel = entry_dir.relative_to(repo)
+                if not NAME_RE.match(full_name):
+                    errors.append(f"{rel}: derived name {full_name!r} fails {NAME_RE.pattern}")
+                    continue
+                if full_name in names:
+                    errors.append(f"{rel}: duplicate name within {category}")
+                    continue
+                names.add(full_name)
+                curation_path = entry_dir / "_hub_curation.yaml"
+                if not curation_path.is_file():
+                    errors.append(f"{rel}: missing _hub_curation.yaml")
+                    continue
+                try:
+                    curation = load_yaml(curation_path)
+                except Exception as exc:
+                    errors.append(f"{rel}/_hub_curation.yaml: parse error: {exc}")
+                    continue
+                # Pull display data from curation; description preferred from SKILL.md
+                # frontmatter for skills (read on demand below).
+                version = curation.get("version") or "1.0.0"
+                description = curation.get("summary") or ""
+                if category == "skill":
+                    skill_md = entry_dir / "SKILL.md"
+                    if skill_md.is_file():
+                        try:
+                            import re as _re
+                            content = skill_md.read_text(encoding="utf-8")
+                            # crude frontmatter peek
+                            if content.startswith("---\n"):
+                                end = content.find("\n---", 4)
+                                if end != -1:
+                                    fm_text = content[4:end]
+                                    fm = yaml.safe_load(fm_text) or {}
+                                    if isinstance(fm, dict):
+                                        d = fm.get("description")
+                                        if isinstance(d, str) and d.strip():
+                                            description = d.strip()
+                        except Exception:
+                            pass
+                body = {
+                    "$schema": f"/schemas/{schemas_dir.name}/{'skill' if category == 'skill' else 'workflow'}.schema.json",
+                    "name": full_name,
+                    "version": version,
+                    "description": description,
+                    "tags": curation.get("tags") or [],
+                }
+                license_spdx = curation.get("license")
+                if license_spdx:
+                    body["license"] = license_spdx
+                if curation.get("contributor"):
+                    body["author"] = curation["contributor"]
+                by_category[category].append({
+                    "curation": curation,
+                    "body": body,
+                    "entry_dir": entry_dir,
+                    "category": category,
+                    "__source_path": str(rel),
+                })
+    return by_category, errors
+
+
+def write_dir_bundle(
+    out_dir: Path,
+    category: str,
+    entry: dict,
+) -> dict:
+    """Build bundle, write tar.gz + manifest.json. Mutates entry['body']
+    in place to attach the bundle pointer. Returns the body."""
+    entry_dir: Path = entry["entry_dir"]
+    body: dict = entry["body"]
+    files = _collect_bundle_files(entry_dir)
+    bundle_bytes, sha, size, fcount = _build_bundle(category, entry_dir, files)
+
+    folder = FOLDER_BY_CAT[category]
+    name = body["name"]
+    namespace, leaf = split_name(name)
+    version = body["version"]
+    rel_bundle = f"{folder}/{namespace}/{leaf}/{version}.tar.gz"
+    target_dir = out_dir / folder / namespace / leaf
+    target_dir.mkdir(parents=True, exist_ok=True)
+    (target_dir / f"{version}.tar.gz").write_bytes(bundle_bytes)
+
+    entry_point = "SKILL.md" if category == "skill" else "workflow.yaml"
+    body["bundle"] = {
+        "url": rel_bundle,
+        "sha256": sha,
+        "size_bytes": size,
+        "file_count": fcount,
+        "entry_point": entry_point,
+    }
+    body.setdefault("dependencies", [])
+
+    target_manifest = target_dir / f"{version}.json"
+    body_out = {k: v for k, v in body.items() if not k.startswith("__")}
+    target_manifest.write_text(json.dumps(body_out, indent=2) + "\n", encoding="utf-8")
+    return body
+
+
+# ----------------------------------------------------------------------------
 # main
 # ----------------------------------------------------------------------------
 
@@ -511,6 +753,23 @@ def main() -> int:
             body = entry["body"]
             write_manifest(out_dir, category, body)
             items.append(index_item(category, curation, body))
+
+    # 3b. Directory-shaped categories (skills + workflows).
+    dir_by_category, dir_errors = load_ziee_native_dirs(repo, schemas_dir)
+    if dir_errors:
+        print(f"\n{len(dir_errors)} dir-category load error(s):", file=sys.stderr)
+        for err in dir_errors:
+            print(f"  - {err}", file=sys.stderr)
+        return 1
+    for category, _, _, _ in CATEGORIES_DIR:
+        for entry in dir_by_category[category]:
+            try:
+                body = write_dir_bundle(out_dir, category, entry)
+            except ValueError as exc:
+                print(f"  ERROR: bundle build failed: {exc}", file=sys.stderr)
+                return 1
+            items.append(index_item(category, entry["curation"], body))
+        print(f"build-pages: {category} bundles built = {len(dir_by_category[category])}")
 
     # Deterministic order by (category, name).
     items.sort(key=lambda it: (it["category"], it["name"]))

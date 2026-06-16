@@ -1,0 +1,10 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+inputs:
+  - name: topic
+    required: true
+
+steps:
+  - id: a
+    kind: llm
+    prompt: "Use {{ inputs.nonexistent }} for {{ inputs.topic }}."

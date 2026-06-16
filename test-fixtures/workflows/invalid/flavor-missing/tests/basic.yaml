@@ -1,0 +1,4 @@
+mode: ci
+inputs: {}
+mocks: {}
+expected_outputs: {}

@@ -1,0 +1,2 @@
+# Sandbox step with whitespace-only run: must be rejected.
+- "WORKFLOW_SANDBOX_NO_RUN"

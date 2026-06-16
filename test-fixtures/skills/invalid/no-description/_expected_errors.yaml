@@ -1,0 +1,2 @@
+# Missing frontmatter `description` must be rejected.
+- "frontmatter `description` is required"

@@ -1,0 +1,54 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+inputs:
+  - name: question
+    required: true
+
+steps:
+  - id: confirm_scope
+    kind: elicit
+    message: "About to research: '{{ inputs.question }}'. OK to proceed?"
+    schema:
+      type: object
+      properties:
+        proceed: { type: boolean }
+        narrow_to: { type: string, description: "Optional: narrower phrasing" }
+      required: [proceed]
+    timeout_ms: 60000
+
+  - id: generate_queries
+    kind: llm
+    prompt: |
+      Generate 5 search queries to answer: {{ confirm_scope.output.narrow_to || inputs.question }}
+      Return JSON array of strings.
+    output_format: json
+    depends_on: [confirm_scope]
+
+  - id: search
+    kind: llm_map
+    for_each: "{{ generate_queries.output }}"
+    item_var: query
+    prompt: |
+      Find 3 authoritative sources for: {{ query }}
+      Return JSON: [{"title": "...", "url": "...", "key_quote": "1-2 sentences from the source that answer the query"}]
+    output_format: json
+    max_parallel: 3
+    on_error: skip
+    depends_on: [generate_queries]
+
+  - id: synthesize
+    kind: llm
+    prompt: |
+      Question: {{ inputs.question }}
+
+      Sources:
+      {{ search.output | json }}
+
+      Write a clear, well-cited answer. Cite inline as [n] referring to a sources list at the end.
+      Return markdown.
+    depends_on: [search]
+
+outputs:
+  - name: answer
+    from: "{{ synthesize.output }}"
+    expose: full

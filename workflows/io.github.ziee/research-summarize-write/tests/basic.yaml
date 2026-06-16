@@ -1,0 +1,15 @@
+mode: ci
+inputs:
+  topic: "transformer architecture"
+mocks:
+  research:
+    - { title: "T1", url: "u1", summary: "s1" }
+    - { title: "T2", url: "u2", summary: "s2" }
+  summarize:
+    - { claim: "c1", supporting_source_url: "u1", confidence: "high" }
+    - { claim: "c2", supporting_source_url: "u2", confidence: "medium" }
+  write: "# Memo on transformer\n\n[T1](u1) is foundational.\n\n## Sources\n- [T1](u1)\n- [T2](u2)"
+expected_outputs:
+  memo:
+    contains: "transformer"
+    min_length: 20

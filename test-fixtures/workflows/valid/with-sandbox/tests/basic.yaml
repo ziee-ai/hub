@@ -1,0 +1,11 @@
+mode: ci
+inputs:
+  topic: "rivers"
+mocks:
+  generate:
+    - ["The Nile is long"]
+    - ["The Amazon is wide"]
+expected_outputs:
+  flattened:
+    matches_schema:
+      type: array

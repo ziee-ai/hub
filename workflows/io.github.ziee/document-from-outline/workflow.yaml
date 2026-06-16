@@ -1,0 +1,50 @@
+$schema: "/schemas/2026-06-12/workflow-definition.schema.json"
+
+inputs:
+  - name: title
+    required: true
+  - name: outline
+    description: "Markdown outline with ## headers per section"
+    required: true
+  - name: tone
+    required: false
+    default: "professional, clear, concise"
+
+steps:
+  - id: parse_outline
+    kind: llm
+    prompt: |
+      Parse this markdown outline into a JSON array of section objects:
+      {{ inputs.outline }}
+      Each: {"heading": "...", "intent": "1-sentence description of what this section covers"}
+      Return JSON only.
+    output_format: json
+
+  - id: write_sections
+    kind: llm_map
+    message: "Writing sections for {{ inputs.title }}"
+    for_each: "{{ parse_outline.output }}"
+    item_var: section
+    prompt: |
+      Write the "{{ section.heading }}" section of a document titled "{{ inputs.title }}".
+      Section intent: {{ section.intent }}
+      Tone: {{ inputs.tone }}
+      Target length: 200-400 words.
+      Return markdown starting with `## {{ section.heading }}`.
+    max_parallel: 3
+    depends_on: [parse_outline]
+
+  - id: assemble
+    kind: llm
+    prompt: |
+      Assemble these sections into a coherent document titled "{{ inputs.title }}":
+      {{ write_sections.output | json }}
+
+      Add a brief intro before the first section and a brief conclusion after the last.
+      Smooth transitions between sections. Return clean markdown.
+    depends_on: [write_sections]
+
+outputs:
+  - name: document
+    from: "{{ assemble.output }}"
+    expose: full

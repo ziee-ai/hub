@@ -1,0 +1,2 @@
+# Unknown {{ inputs.nonexistent }} reference must be caught.
+- "WORKFLOW_UNKNOWN_VAR_REF"

@@ -1,0 +1,19 @@
+mode: ci
+inputs:
+  title: "Introduction to Transformers"
+  outline: "## Background\n## Architecture\n## Applications"
+  tone: "clear, technical"
+mocks:
+  parse_outline:
+    - { heading: "Background", intent: "Why transformers were invented" }
+    - { heading: "Architecture", intent: "Attention + feed-forward stacks" }
+    - { heading: "Applications", intent: "NLP, vision, multimodal" }
+  write_sections:
+    - "## Background\nTransformers emerged in 2017..."
+    - "## Architecture\nAttention is all you need..."
+    - "## Applications\nFrom NLP to vision..."
+  assemble: "# Introduction to Transformers\n\nA short intro.\n\n## Background\nTransformers emerged in 2017...\n\n## Architecture\nAttention is all you need...\n\n## Applications\nFrom NLP to vision...\n\nA short conclusion.\n"
+expected_outputs:
+  document:
+    contains: "Transformers"
+    min_length: 50
