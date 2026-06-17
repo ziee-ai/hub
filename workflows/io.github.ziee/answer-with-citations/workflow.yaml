@@ -12,14 +12,13 @@ steps:
       type: object
       properties:
         proceed: { type: boolean }
-        narrow_to: { type: string, description: "Optional: narrower phrasing" }
       required: [proceed]
     timeout_ms: 60000
 
   - id: generate_queries
     kind: llm
     prompt: |
-      Generate 5 search queries to answer: {{ confirm_scope.output.narrow_to || inputs.question }}
+      Generate 5 search queries to answer: {{ inputs.question }}
       Return JSON array of strings.
     output_format: json
     depends_on: [confirm_scope]
