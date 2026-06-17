@@ -24,6 +24,8 @@ on:
       - 'models/**'
       - 'assistants/**'
       - 'mcp-servers/**'
+      - 'workflows/**'
+      - 'skills/**'
       - 'schemas/2026-06-12/**'
       - 'scripts/build-pages.py'
       - 'scripts/validate.py'
