@@ -13,7 +13,7 @@ _hub_curation:
   summary: Expert code reviewer with a security-and-best-practices focus.
 
 $schema: /schemas/2026-06-12/assistant.schema.json
-name: io.github.phibya/code-reviewer
+name: io.github.ziee-ai/code-reviewer
 version: 1.0.0
 display_name: Code Reviewer
 description: Expert code reviewer with a security-and-best-practices focus.
@@ -40,10 +40,10 @@ capabilities_required:
 
 dependencies:
   - kind: model
-    name: io.github.phibya/llama-3-1-8b-instruct
+    name: io.github.ziee-ai/llama-3-1-8b-instruct
     versionRange: "*"
   - kind: model
-    name: io.github.phibya/phi-3-mini-4k-instruct
+    name: io.github.ziee-ai/phi-3-mini-4k-instruct
     versionRange: "*"
 
 author: Ziee Team

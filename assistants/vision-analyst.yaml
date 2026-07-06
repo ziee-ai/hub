@@ -13,7 +13,7 @@ _hub_curation:
   summary: Specialized assistant for image and visual content analysis.
 
 $schema: /schemas/2026-06-12/assistant.schema.json
-name: io.github.phibya/vision-analyst
+name: io.github.ziee-ai/vision-analyst
 version: 1.0.0
 display_name: Vision Analyst
 description: Specialized assistant for image and visual content analysis.
@@ -40,7 +40,7 @@ capabilities_required:
 
 dependencies:
   - kind: model
-    name: io.github.phibya/qwen2.5-vl-3b-instruct
+    name: io.github.ziee-ai/qwen2.5-vl-3b-instruct
     versionRange: "*"
 
 author: Ziee Team

@@ -13,7 +13,7 @@ _hub_curation:
   summary: Professional creative writer for stories, articles, and content.
 
 $schema: /schemas/2026-06-12/assistant.schema.json
-name: io.github.phibya/creative-writer
+name: io.github.ziee-ai/creative-writer
 version: 1.0.0
 display_name: Creative Writer
 description: Professional creative writer for stories, articles, and content.
@@ -36,10 +36,10 @@ tags:
 
 dependencies:
   - kind: model
-    name: io.github.phibya/llama-3-1-8b-instruct
+    name: io.github.ziee-ai/llama-3-1-8b-instruct
     versionRange: "*"
   - kind: model
-    name: io.github.phibya/phi-3-mini-4k-instruct
+    name: io.github.ziee-ai/phi-3-mini-4k-instruct
     versionRange: "*"
 
 author: Ziee Team

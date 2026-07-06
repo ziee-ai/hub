@@ -12,7 +12,7 @@ _hub_curation:
   summary: Writes, explains, and optimizes SQL across Postgres, MySQL, and SQLite dialects.
 
 $schema: /schemas/2026-06-12/assistant.schema.json
-name: io.github.phibya/sql-helper
+name: io.github.ziee-ai/sql-helper
 version: 1.0.0
 display_name: SQL Helper
 description: Writes, explains, and optimizes SQL across Postgres, MySQL, and SQLite dialects.
@@ -39,10 +39,10 @@ capabilities_required:
 
 dependencies:
   - kind: model
-    name: io.github.phibya/qwen2.5-coder-7b-instruct
+    name: io.github.ziee-ai/qwen2.5-coder-7b-instruct
     versionRange: "*"
   - kind: model
-    name: io.github.phibya/llama-3-1-8b-instruct
+    name: io.github.ziee-ai/llama-3-1-8b-instruct
     versionRange: "*"
   - kind: mcp-server
     name: io.github.modelcontextprotocol/postgres

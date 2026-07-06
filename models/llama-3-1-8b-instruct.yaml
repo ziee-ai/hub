@@ -13,7 +13,7 @@ _hub_curation:
   summary: Meta's Llama 3.1 8B instruction-tuned model with improved capabilities.
 
 $schema: /schemas/2026-06-12/model.schema.json
-name: io.github.phibya/llama-3-1-8b-instruct
+name: io.github.ziee-ai/llama-3-1-8b-instruct
 version: 1.0.0
 display_name: Llama 3.1 8B
 description: Meta's Llama 3.1 8B instruction-tuned model with improved capabilities.
