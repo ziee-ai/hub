@@ -13,7 +13,7 @@ _hub_curation:
   summary: Microsoft's small but capable instruction-tuned model. Great for low-resource setups.
 
 $schema: /schemas/2026-06-12/model.schema.json
-name: io.github.phibya/phi-3-mini-4k-instruct
+name: io.github.ziee-ai/phi-3-mini-4k-instruct
 version: 1.0.0
 display_name: Phi-3 Mini
 description: Microsoft's small but capable instruction-tuned model. Great for low-resource setups.

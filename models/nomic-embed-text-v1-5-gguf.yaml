@@ -16,7 +16,7 @@ _hub_curation:
   summary: High-quality general-purpose English embedding model (768-dim) packaged as GGUF for llama.cpp.
 
 $schema: /schemas/2026-06-12/model.schema.json
-name: io.github.phibya/nomic-embed-text-v1-5-gguf
+name: io.github.ziee-ai/nomic-embed-text-v1-5-gguf
 version: 1.0.0
 display_name: Nomic Embed Text v1.5
 description: High-quality general-purpose English embedding model (768-dim) packaged as GGUF for llama.cpp. Recommended default for the Memory module.

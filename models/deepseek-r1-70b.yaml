@@ -12,7 +12,7 @@ _hub_curation:
   summary: Large reasoning model. Flagged as requiring a future ziee-chat for its tensor-parallel runtime support.
 
 $schema: /schemas/2026-06-12/model.schema.json
-name: io.github.phibya/deepseek-r1-70b
+name: io.github.ziee-ai/deepseek-r1-70b
 version: 1.0.0
 display_name: DeepSeek-R1 70B
 description: Large reasoning model. Flagged as requiring a future ziee-chat for its tensor-parallel runtime support — used to exercise the compat gate.

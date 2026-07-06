@@ -12,7 +12,7 @@ _hub_curation:
   summary: Multi-step research assistant. Pinned to a future ziee-chat that ships the parallel sub-agent runtime.
 
 $schema: /schemas/2026-06-12/assistant.schema.json
-name: io.github.phibya/deep-researcher
+name: io.github.ziee-ai/deep-researcher
 version: 1.0.0
 display_name: Deep Researcher
 description: Multi-step research assistant. Pinned to a future ziee-chat that ships the parallel sub-agent runtime — used to exercise the compat gate.
@@ -35,10 +35,10 @@ tags:
 
 dependencies:
   - kind: model
-    name: io.github.phibya/deepseek-r1-70b
+    name: io.github.ziee-ai/deepseek-r1-70b
     versionRange: "*"
   - kind: model
-    name: io.github.phibya/llama-3-1-8b-instruct
+    name: io.github.ziee-ai/llama-3-1-8b-instruct
     versionRange: "*"
   - kind: mcp-server
     name: com.brave/search-mcp

@@ -14,7 +14,7 @@ _hub_curation:
   summary: Qwen2.5-VL 3B instruction-tuned vision-language model. Supports image understanding plus tool use.
 
 $schema: /schemas/2026-06-12/model.schema.json
-name: io.github.phibya/qwen2.5-vl-3b-instruct
+name: io.github.ziee-ai/qwen2.5-vl-3b-instruct
 version: 1.0.0
 display_name: Qwen2.5-VL 3B
 description: Qwen2.5-VL 3B instruction-tuned vision-language model. Supports image understanding plus tool use.
